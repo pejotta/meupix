@@ -1,13 +1,17 @@
 async function criar() {
-  const pixKey = document.getElementById("pix").value;
+  const pix = document.getElementById("pix").value;
 
-  const res = await fetch("/api/create", {
+  if (!pix) {
+    alert("Digite uma chave PIX");
+    return;
+  }
+
+  const res = await fetch("/api/generate", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pixKey })
+    body: JSON.stringify({ pix })
   });
 
   const data = await res.json();
-  document.getElementById("resultado").innerHTML =
-    `<a href="${data.url}" target="_blank">${data.url}</a>`;
+  document.getElementById("resultado").innerText = data.link;
 }
