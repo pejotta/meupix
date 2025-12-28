@@ -1,6 +1,11 @@
 export async function onRequest(context) {
   const slug = context.params.slug;
 
+  // 🔒 Ignora arquivos estáticos (css, js, png, etc)
+  if (slug.includes(".")) {
+    return context.next();
+  }
+
   const pix = await context.env.PIX_KV.get(slug);
 
   if (!pix) {
@@ -15,29 +20,26 @@ export async function onRequest(context) {
       <title>Copiar PIX</title>
       <style>
         body {
-          background: #0b0b0b;
-          color: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 100vh;
-          font-family: Arial, sans-serif;
-        }
-        .box {
-          text-align: center;
+          background:#0b0b0b;
+          color:#fff;
+          font-family:Arial,sans-serif;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          height:100vh;
         }
         input {
-          width: 300px;
-          padding: 10px;
-          font-size: 16px;
+          width:320px;
+          padding:14px;
+          font-size:16px;
+          text-align:center;
         }
       </style>
     </head>
     <body>
-      <div class="box">
+      <div>
         <h2>Chave PIX</h2>
         <input value="${pix}" readonly onclick="this.select()">
-        <p>Clique para copiar</p>
       </div>
     </body>
     </html>
