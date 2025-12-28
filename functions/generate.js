@@ -10,7 +10,7 @@ export async function onRequestPost(context) {
   await context.env.PIX_KV.put(slug, pix);
 
   return new Response(
-    JSON.stringify({ link: `https://meupix.com/${slug}` }),
+    JSON.stringify({ link: `https://meupix.pages.dev/${slug}` }),
     { headers: { "Content-Type": "application/json" } }
   );
 }
