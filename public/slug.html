@@ -2,40 +2,23 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Chave PIX</title>
-  <style>
-    body {
-      background: #000;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
-      font-family: Arial;
-    }
-    button {
-      margin-top: 20px;
-    }
-  </style>
+  <title>Receber PIX</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <h2>Sua chave PIX</h2>
-  <p id="pix"></p>
-  <button onclick="copiar()">Copiar</button>
+  <div class="container">
+    <h1>Enviar PIX</h1>
 
-<script>
-const slug = location.pathname.replace("/", "");
+    <p class="label">Chave PIX:</p>
 
-fetch(`/api/${slug}`)
-  .then(r => r.json())
-  .then(d => document.getElementById("pix").innerText = d.pixKey);
+    <div class="pix-box">
+      <input id="pixValue" value="{{PIX_AQUI}}" readonly>
+      <button onclick="copiarPix()">Copiar</button>
+    </div>
 
-function copiar() {
-  navigator.clipboard.writeText(
-    document.getElementById("pix").innerText
-  );
-}
-</script>
+    <p id="feedback"></p>
+  </div>
+
+  <script src="/pix.js"></script>
 </body>
 </html>
