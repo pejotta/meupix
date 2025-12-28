@@ -1,1 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Chave PIX</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      font-family: Arial;
+    }
+    button {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Sua chave PIX</h2>
+  <p id="pix"></p>
+  <button onclick="copiar()">Copiar</button>
 
+<script>
+const slug = location.pathname.replace("/", "");
+
+fetch(`/api/${slug}`)
+  .then(r => r.json())
+  .then(d => document.getElementById("pix").innerText = d.pixKey);
+
+function copiar() {
+  navigator.clipboard.writeText(
+    document.getElementById("pix").innerText
+  );
+}
+</script>
+</body>
+</html>
