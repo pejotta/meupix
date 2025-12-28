@@ -1,16 +1,6 @@
-export async function onRequestPost(context) {
-  const { pix } = await context.request.json();
-
-  if (!pix) {
-    return new Response("PIX vazio", { status: 400 });
-  }
-
-  const slug = Math.random().toString(36).substring(2, 7);
-
-  await context.env.PIX_KV.put(slug, pix);
-
+export async function onRequestPost() {
   return new Response(
-    JSON.stringify({ link: `https://meupix.pages.dev/${slug}` }),
+    JSON.stringify({ link: "FUNCIONOU AGORA" }),
     { headers: { "Content-Type": "application/json" } }
   );
 }
