@@ -3,7 +3,10 @@ export async function onRequestPost(context) {
     const { pix } = await context.request.json();
 
     if (!pix) {
-      return new Response("PIX vazio", { status: 400 });
+      return new Response(
+        JSON.stringify({ error: "PIX vazio" }),
+        { status: 400 }
+      );
     }
 
     const slug = Math.random().toString(36).substring(2, 7);
@@ -19,7 +22,7 @@ export async function onRequestPost(context) {
 
   } catch (err) {
     return new Response(
-      "Erro interno: " + err.message,
+      JSON.stringify({ error: err.message }),
       { status: 500 }
     );
   }
