@@ -110,3 +110,33 @@ button:active {
   margin-top: 12px;
   font-weight: bold;
 }
+
+/* ===== Estilos globais (home, geral) ===== */
+body {
+  font-family: Arial, sans-serif;
+}
+
+/* ===== Página PIX ===== */
+.pix-page {
+  background: #111;
+  min-height: 100vh;
+  color: #fff;
+  text-align: center;
+}
+
+.pix-page input {
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+}
+
+.pix-page button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.pix-page #qrcode {
+  margin: 20px auto;
+}
+
