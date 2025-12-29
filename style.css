@@ -35,7 +35,8 @@ header {
     margin: 0 auto;
 }
 
-.logo { font-size: 1.5rem; font-weight: 800; }
+.logo { font-size: 1.5rem; font-weight: 800; max-width:200px; height:auto; }
+.logo img { font-size: 1.5rem; font-weight: 800; max-width:200px; height:auto;}
 .logo span { color: var(--primary); }
 
 .nav-links { list-style: none; display: flex; align-items: center; gap: 30px; }
