@@ -1,6 +1,6 @@
-export async function onRequestPost(context) {
+export async function onRequestPost({ request, env }) {
   try {
-    const { pix } = await context.request.json();
+    const { pix } = await request.json();
 
     if (!pix) {
       return new Response(
@@ -9,9 +9,9 @@ export async function onRequestPost(context) {
       );
     }
 
-    const slug = Math.random().toString(36).substring(2, 7);
+    const slug = Math.random().toString(36).slice(2, 7);
 
-    await context.env.PIX_KV.put(slug, pix);
+    await env.PIX_KV.put(slug, pix);
 
     return new Response(
       JSON.stringify({
@@ -22,7 +22,7 @@ export async function onRequestPost(context) {
 
   } catch (err) {
     return new Response(
-      JSON.stringify({ error: err.message }),
+      JSON.stringify({ error: "Erro interno" }),
       { status: 500 }
     );
   }
