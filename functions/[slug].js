@@ -1,7 +1,6 @@
-export default function PixPage() {
+import '@/styles/style.css' // ✅ SEMPRE no topo
 
-  import '@/styles/style.css'
-    
+export default function PixPage() {
   return (
     <div className="pix-page">
       <div className="container">
