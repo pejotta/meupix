@@ -10,40 +10,38 @@
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; }
         .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
         
-        /* Header Dashboard */
-        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; position: relative;}
-        .user-info { display: flex; align-items: center; gap: 10px; }
+        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .logo-dash { height: 40px; } /* Para o seu carimbo branco */
         .badge-free { background: #333; padding: 4px 10px; border-radius: 20px; font-size: 12px; color: #aaa; }
 
-        /* Grid de Stats */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
         .stat-card { background: var(--card); padding: 25px; border-radius: 16px; border: 1px solid #222; position: relative; overflow: hidden; }
         .stat-card h3 { margin: 0; font-size: 14px; color: #888; text-transform: uppercase; }
         .stat-card .value { font-size: 32px; font-weight: bold; margin-top: 10px; display: block; }
 
-        /* Efeito de Travado (PRO) */
         .locked { filter: blur(4px); pointer-events: none; user-select: none; }
         .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; 
                          justify-content: center; align-items: center; background: rgba(0,0,0,0.4); z-index: 2; border-radius: 16px; }
         .lock-icon { font-size: 24px; margin-bottom: 10px; }
         .btn-upgrade-small { background: var(--primary); color: #000; padding: 6px 15px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px; }
 
-        /* Tabela de Links */
         .links-section { background: var(--card); border-radius: 16px; border: 1px solid #222; padding: 20px; }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 15px; color: #555; border-bottom: 1px solid #222; }
         td { padding: 15px; border-bottom: 1px solid #222; }
-        .btn-del { color: #ff4d4d; background: none; border: none; cursor: pointer; }
+        .btn-del { color: #ff4d4d; background: none; border: none; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
         <header class="dash-header">
             <div class="user-info">
-                <h1>Painel</h1>
+                <img src="/assets/meupix-carimbo-branco.png" alt="MeuPIX" class="logo-dash">
                 <span class="badge-free">Plano Free</span>
             </div>
-            <button onclick="window.location.href='/'" style="background:#222; color:#fff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">+ Novo Link</button>
+            <div id="header-actions">
+                </div>
         </header>
 
         <div class="stats-grid">
@@ -76,11 +74,14 @@
         </div>
 
         <div class="links-section">
-            <h2>Seus Links</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Seus Links PIX</h2>
+                <button onclick="window.location.href='/'" style="background:var(--primary); color:#000; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">+ Novo Link</button>
+            </div>
             <table>
                 <thead>
                     <tr>
-                        <th>Link Curto</th>
+                        <th>Atalho (Slug)</th>
                         <th>Chave PIX</th>
                         <th>Cliques</th>
                         <th>Ações</th>
@@ -94,40 +95,11 @@
 
     <script src="app.js"></script>
     <script>
-        // Ao carregar a página, busca os dados da API do Worker
-        window.onload = carregarDashboard;
-
-        async function carregarDashboard() {
-            // Se você configurou o Worker como discutimos, a rota é /api/links
-            const res = await fetch('/api/links'); 
-            const links = await res.json();
-            
-            const tbody = document.getElementById('linksBody');
-            let total = 0;
-
-            tbody.innerHTML = links.map(l => {
-                total += (l.clicks || 0);
-                return `
-                    <tr>
-                        <td><a href="/${l.slug}" target="_blank" style="color:var(--primary)">/${l.slug}</a></td>
-                        <td>${l.pix.substring(0, 15)}...</td>
-                        <td>📊 ${l.clicks || 0}</td>
-                        <td><button class="btn-del" onclick="deletarLink('${l.slug}')">Excluir</button></td>
-                    </tr>
-                `;
-            }).join('');
-
-            document.getElementById('totalClicks').innerText = total;
-        }
-
-        async function deletarLink(slug) {
-            if(confirm('Deseja apagar este link permanentemente?')) {
-                await fetch(`/api/links?slug=${slug}`, { method: 'DELETE' });
-                carregarDashboard();
-            }
-        }
+        // Iniciamos a carga dos dados assim que a página abrir
+        window.onload = () => {
+            verificarSessao();
+            carregarMeusLinks();
+        };
     </script>
 </body>
 </html>
-// No final do dashboard.html
-window.onload = carregarMeusLinks;
