@@ -1,23 +1,29 @@
 export async function onRequest({ request, params, env }) {
   const slug = params.slug;
 
-  // TRAVA: Se o slug tiver ponto (ex: style.css, favicon.ico), 
-  // deixa o Cloudflare entregar o arquivo real e não executa a função.
+  // 1. TRAVA DE ARQUIVOS ESTÁTICOS
+  // Se o navegador pedir style.css ou app.js, o Worker ignora e entrega o arquivo real
   if (slug.includes('.')) {
     return env.ASSETS.fetch(request);
   }
-  
-export async function onRequest({ params, env }) {
-  const slug = params.slug;
+
+  // 2. BUSCA NO BANCO DE DADOS (KV)
   const dataRaw = await env.PIX_KV.get(slug);
 
   if (!dataRaw) {
     return new Response("Link PIX não encontrado ou expirado.", { status: 404 });
   }
 
-  // Transformamos a string do Banco de Dados de volta em objeto
-  const data = JSON.parse(dataRaw);
+  // 3. PROCESSAMENTO DOS DADOS
+  let data;
+  try {
+    data = JSON.parse(dataRaw);
+  } catch (e) {
+    // Caso o dado no banco seja apenas a chave (versão antiga), tratamos aqui
+    data = { pix: dataRaw };
+  }
 
+  // 4. RETORNO DO HTML DA PÁGINA DE PAGAMENTO
   const html = `
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -35,14 +41,12 @@ export async function onRequest({ params, env }) {
     </div>
 
     <div class="pix-box-area">
-      <input id="pixKey" value="${data.pix}" readonly>
-      <button class="btn-copy" onclick="copiar()">Copiar Chave PIX</button>
+      <input id="pixKey" style="width: 100%; padding: 10px; text-align: center; margin-bottom: 10px;" value="${data.pix}" readonly>
+      <button class="btn-copy" style="width: 100%; padding: 15px; background: #00c896; border: none; font-weight: bold; cursor: pointer;" onclick="copiar()">Copiar Chave PIX</button>
     </div>
 
-    <div id="qrcode-area">
-       </div>
-
-    <p id="msg"></p>
+    <div id="qrcode-area"></div>
+    <p id="msg" style="margin-top: 15px; color: #00c896; font-weight: bold;"></p>
   </div>
 
   <script>
@@ -56,5 +60,7 @@ export async function onRequest({ params, env }) {
 </body>
 </html>`;
 
-  return new Response(html, { headers: { "Content-Type": "text/html" } });
+  return new Response(html, { 
+    headers: { "Content-Type": "text/html; charset=utf-8" } 
+  });
 }
