@@ -1,3 +1,12 @@
+export async function onRequest({ request, params, env }) {
+  const slug = params.slug;
+
+  // TRAVA: Se o slug tiver ponto (ex: style.css, favicon.ico), 
+  // deixa o Cloudflare entregar o arquivo real e não executa a função.
+  if (slug.includes('.')) {
+    return env.ASSETS.fetch(request);
+  }
+  
 export async function onRequest({ params, env }) {
   const slug = params.slug;
   const dataRaw = await env.PIX_KV.get(slug);
