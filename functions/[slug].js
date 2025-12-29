@@ -45,9 +45,12 @@ export async function onRequest({ request, params, env }) {
       <button class="btn-copy" style="width: 100%; padding: 15px; background: #00c896; border: none; font-weight: bold; cursor: pointer;" onclick="copiar()">Copiar Chave PIX</button>
     </div>
 
-    <div id="qrcode-area"></div>
-    <p id="msg" style="margin-top: 15px; color: #00c896; font-weight: bold;"></p>
-  </div>
+    <div id="qrcode-area" style="margin: 20px auto; padding: 15px; background: white; width: fit-content; border-radius: 10px;">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.pix)}" 
+             alt="QR Code PIX" 
+             style="display: block;">
+        <p style="color: #333; font-size: 0.8rem; margin-top: 5px; font-weight: bold;">Aponte a câmera para pagar</p>
+    </div>
 
   <script>
     function copiar() {
