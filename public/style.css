@@ -111,11 +111,6 @@ button:active {
   font-weight: bold;
 }
 
-/* ===== Estilos globais (home, geral) ===== */
-body {
-  font-family: Arial, sans-serif;
-}
-
 /* ===== Página PIX ===== */
 .pix-page {
   background: #111;
