@@ -61,7 +61,7 @@ header {
 .hero p { color: var(--text-dim); font-size: 1.2rem; margin-bottom: 40px;}
 
 .auth-container button {
-    background: var(--primary); color: #000 !important; padding: 8px 20px; border-radius: 6px;  font-size:1.1em; 
+    background: var(--primary); color: #000 !important; padding: 8px 20px; border-radius: 6px;  font-size:1.1em; cursor: pointer;
 }
 
 .generator-box {
