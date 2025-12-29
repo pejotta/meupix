@@ -1,1 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>MeuPIX - Dashboard Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard { max-width: 900px; margin: 100px auto; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #121212; border-radius: 10px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #222; }
+        th { background: #1b1b1b; color: var(--primary); }
+        .btn-del { color: #ff4d4d; cursor: pointer; background: none; border: none; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Seus Links PIX</h1>
+        <table id="linksTable">
+            <thead>
+                <tr>
+                    <th>Atalho (Slug)</th>
+                    <th>Chave PIX</th>
+                    <th>Cliques</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listaLinks">
+                </tbody>
+        </table>
+    </div>
 
+    <script>
+        async function carregarLinks() {
+            const res = await fetch('/api/links');
+            const links = await res.json();
+            const lista = document.getElementById('listaLinks');
+            lista.innerHTML = links.map(l => `
+                <tr>
+                    <td><a href="/${l.slug}" target="_blank" style="color: #00c896;">/${l.slug}</a></td>
+                    <td>${l.pix.substring(0, 15)}...</td>
+                    <td>🔥 ${l.clicks || 0}</td>
+                    <td><button class="btn-del" onclick="deletar('${l.slug}')">Excluir</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function deletar(slug) {
+            if(confirm('Deseja excluir este link?')) {
+                await fetch('/api/links?slug=' + slug, { method: 'DELETE' });
+                carregarLinks();
+            }
+        }
+        carregarLinks();
+    </script>
+</body>
+</html>
