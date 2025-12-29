@@ -11,37 +11,53 @@ export async function onRequest({ params, env }) {
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>PIX para copiar</title>
+  <title>Oferta via PIX</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS GLOBAL -->
   <link rel="stylesheet" href="/style.css">
+
+  <!-- QRCode lib -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
+
 <body>
-  <div class="container">
-    <h2>Oferta via PIX</h2>
+  <div class="pix-page">
+    <div class="container">
+      <h2>Oferta via PIX</h2>
 
-    <div id="qrcode"></div>
+      <div id="qrcode"></div>
 
-    <input id="pixKey" value="${pix}" readonly>
+      <input
+        id="pixKey"
+        type="text"
+        value="CHAVE_PIX_AQUI"
+        readonly
+      >
 
-    <button onclick="copiar()">Copiar chave PIX</button>
+      <button id="copyBtn">Copiar chave PIX</button>
 
-    <p id="msg"></p>
+      <p id="msg"></p>
+    </div>
   </div>
 
   <script>
+    // Gera QR Code
     new QRCode(document.getElementById("qrcode"), {
-      text: "${pix}",
+      text: document.getElementById("pixKey").value,
       width: 180,
       height: 180
     });
 
-    function copiar() {
+    // Copiar PIX
+    document.getElementById("copyBtn").addEventListener("click", () => {
       const input = document.getElementById("pixKey");
       input.select();
       input.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(input.value);
+
       document.getElementById("msg").innerText = "PIX copiado com sucesso 🙌";
-    }
+    });
   </script>
 </body>
 </html>
