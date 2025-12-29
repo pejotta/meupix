@@ -1,24 +1,15 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <title>Receber PIX</title>
-  <link rel="stylesheet" href="/style.css">
-</head>
 <body>
-  <div class="container">
-    <h1>Enviar PIX</h1>
+  <div class="pix-page">
+    <div class="container">
+      <h2>Oferta via PIX</h2>
 
-    <p class="label">Chave PIX:</p>
+      <div id="qrcode"></div>
 
-    <div class="pix-box">
-      <input id="pixValue" value="{{PIX_AQUI}}" readonly>
-      <button onclick="copiarPix()">Copiar</button>
+      <input id="pixKey" value="CHAVE_PIX_AQUI" readonly>
+
+      <button onclick="copiar()">Copiar chave PIX</button>
+
+      <p id="msg"></p>
     </div>
-
-    <p id="feedback"></p>
   </div>
-
-  <script src="/pix.js"></script>
 </body>
-</html>
