@@ -1,33 +1,46 @@
-import '@/styles/style.css' // ✅ SEMPRE no topo
+export async function onRequest({ params, env }) {
+  const slug = params.slug;
+  const pix = await env.PIX_KV.get(slug);
 
-export default function PixPage() {
-  return (
-    <div className="pix-page">
-      <div className="container">
-        <h2>Oferta via PIX</h2>
+  if (!pix) {
+    return new Response("Link PIX não encontrado", { status: 404 });
+  }
 
-        <div id="qrcode"></div>
+  const html = `
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>PIX</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="pix-page">
+    <div class="container">
+      <h2>Oferta via PIX</h2>
 
-        <input
-          id="pixKey"
-          value="CHAVE_PIX_AQUI"
-          readOnly
-        />
+      <input id="pixKey" value="${pix}" readonly>
 
-        <button onClick={copiar}>
-          Copiar chave PIX
-        </button>
+      <button onclick="copiar()">Copiar chave PIX</button>
 
-        <p id="msg"></p>
-      </div>
+      <p id="msg"></p>
     </div>
-  )
-}
+  </div>
 
-function copiar() {
-  const input = document.getElementById('pixKey')
-  input.select()
-  document.execCommand('copy')
+  <script>
+    function copiar() {
+      const input = document.getElementById("pixKey");
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      document.getElementById("msg").innerText = "Chave copiada!";
+    }
+  </script>
+</body>
+</html>
+  `;
 
-  document.getElementById('msg').innerText = 'Chave copiada!'
+  return new Response(html, {
+    headers: { "Content-Type": "text/html" }
+  });
 }
