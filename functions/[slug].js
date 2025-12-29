@@ -23,6 +23,16 @@ export async function onRequest({ request, params, env }) {
     data = { pix: dataRaw };
   }
 
+  // ... dentro do functions/[slug].js ...
+const dataRaw = await env.PIX_KV.get(slug);
+if (!dataRaw) return new Response("Link não encontrado", { status: 404 });
+
+let data = JSON.parse(dataRaw);
+
+// Incrementa o contador de cliques e salva de volta (sem esperar, para não atrasar o carregamento)
+data.clicks = (data.clicks || 0) + 1;
+await env.PIX_KV.put(slug, JSON.stringify(data));
+
   // 4. RETORNO DO HTML DA PÁGINA DE PAGAMENTO
   const html = `
 <!DOCTYPE html>
