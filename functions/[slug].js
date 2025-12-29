@@ -1,13 +1,11 @@
 export async function onRequest({ params, env }) {
-  const slug = params.slug;
-  const pix = await env.PIX_KV.get(slug);
+  const pix = await env.PIX_KV.get(params.slug);
 
   if (!pix) {
-    return new Response("Link PIX não encontrado", { status: 404 });
+    return new Response("PIX não encontrado", { status: 404 });
   }
 
-  const html = `
-<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -61,9 +59,9 @@ export async function onRequest({ params, env }) {
   </script>
 </body>
 </html>
-  `;
+`;
 
   return new Response(html, {
-    headers: { "Content-Type": "text/html" },
+    headers: { "Content-Type": "text/html" }
   });
 }
