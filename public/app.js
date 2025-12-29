@@ -13,5 +13,10 @@ async function criar() {
   });
 
   const data = await res.json();
-  document.getElementById("resultado").innerText = data.link;
+
+  document.getElementById("resultado").innerHTML = `
+    <a href="${data.link}" target="_blank">
+      ${data.link}
+    </a>
+  `;
 }
