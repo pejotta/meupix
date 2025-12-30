@@ -54,10 +54,11 @@ async function autenticar(e, tipo) {
 
 // --- 4. GESTÃO DE LINKS ---
 
+// 🏆 Função Inteligente (Home ou Dashboard)
 async function criar(pixManual = null, slugManual = null) {
-    // 🔍 Busca inteligente de elementos (suporta Home e Modal do Dashboard)
-    const pix = pixManual || document.getElementById("novoPix")?.value || document.getElementById("pix")?.value;
-    const customSlug = slugManual || document.getElementById("novoSlug")?.value;
+    // 🔍 Busca os valores. Prioriza o que vem por parâmetro (Dashboard) ou busca no HTML (Home)
+    const pix = pixManual || document.getElementById("pix")?.value;
+    const customSlug = slugManual || document.getElementById("slug")?.value;
     const token = localStorage.getItem('meupix_token');
     
     if (!pix) return alert("Chave PIX obrigatória!");
@@ -75,21 +76,26 @@ async function criar(pixManual = null, slugManual = null) {
         const data = await res.json();
 
         if (res.ok) {
-            const container = document.getElementById("container-resultado");
-            const linkElem = document.getElementById("link-gerado");
-            
-            if (container && linkElem) {
-                container.style.display = "block";
-                const host = window.location.host; 
+            // Se estiver no Dashboard (tem token), atualiza a lista e avisa o sucesso
+            if (token) {
+                alert("Link criado com sucesso!");
+                carregarMeusLinks(); // Atualiza a tabela no Banco de Dados
                 
-                // ✅ Link formatado para passar pelo Redirecionador do Worker
-                linkElem.innerText = `${host}/${data.slug}`;
-                linkElem.href = `https://${host}/${data.slug}`;
-                
-                if (token) {
-                    carregarMeusLinks(); // Atualiza a tabela no Banco de Dados
-                    const modal = document.getElementById('modalNovoLink');
-                    if (modal) modal.style.display = 'none';
+                // Limpa e fecha o modal se os IDs baterem com seu HTML
+                if (document.getElementById('modalNovoLink')) {
+                    document.getElementById('modalNovoLink').style.display = 'none';
+                    document.getElementById('novoPix').value = '';
+                    document.getElementById('novoSlug').value = '';
+                }
+            } else {
+                // Se estiver na Home, mostra o card de resultado
+                const container = document.getElementById("container-resultado");
+                const linkElem = document.getElementById("link-gerado");
+                if (container && linkElem) {
+                    container.style.display = "block";
+                    const host = window.location.host; 
+                    linkElem.innerText = `${host}/${data.slug}`;
+                    linkElem.href = `https://${host}/${data.slug}`;
                 }
             }
         } else {
@@ -100,15 +106,16 @@ async function criar(pixManual = null, slugManual = null) {
     }
 }
 
+// 👑 Função auxiliar para o Modal do Dashboard
 async function criarNovoLink() {
-    const pix = document.getElementById('novoPix').value;
-    const slug = document.getElementById('novoSlug').value;
-    if(!pix) return alert("Insira uma chave PIX!");
+    // Verifique se no seu dashboard.html os IDs do modal são exatamente esses:
+    const pixInput = document.getElementById('novoPix');
+    const slugInput = document.getElementById('novoSlug');
     
-    await criar(pix, slug);
+    if (!pixInput || !pixInput.value) return alert("Insira uma chave PIX!");
     
-    document.getElementById('novoPix').value = '';
-    document.getElementById('novoSlug').value = '';
+    // Passa os valores capturados para a função principal
+    await criar(pixInput.value, slugInput.value);
 }
 
 async function carregarMeusLinks() {
