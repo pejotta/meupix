@@ -1,11 +1,21 @@
 const API_URL = "https://meupix-api.moneynanet-yt.workers.dev";
 
-// --- 1. ESTADO GLOBAL PARA PAGINAÇÃO ---
+// --- 1. ESTADO GLOBAL E CONFIGURAÇÕES ---
 let linksGlobais = [];
 let paginaAtual = 1;
 const linksPorPagina = 5;
 
-// --- 2. FUNÇÕES DE NAVEGAÇÃO E AUTH ---
+// --- 2. FUNÇÕES DE NAVEGAÇÃO E IDENTIDADE ---
+
+function injetarFavicon() {
+    let fav = document.querySelector("link[rel~='icon']");
+    if (!fav) {
+        fav = document.createElement('link');
+        fav.rel = 'icon';
+        document.head.appendChild(fav);
+    }
+    fav.href = '/assets/meupix-logo.png'; 
+}
 
 function verificarSessao() {
     const token = localStorage.getItem('meupix_token');
@@ -20,7 +30,7 @@ function logout() {
     window.location.href = '/login.html';
 }
 
-// --- 3. GESTÃO DE LINKS E BANCO DE DADOS ---
+// --- 3. GESTÃO DE LINKS (TABELA E PAGINAÇÃO) ---
 
 async function carregarMeusLinks() {
     const token = verificarSessao();
@@ -30,14 +40,11 @@ async function carregarMeusLinks() {
         const res = await fetch(`${API_URL}/api/links`, {
             headers: { 'Authorization': token }
         });
-
         if (res.status === 401) return logout();
-
         linksGlobais = await res.json();
-        // Ordena por cliques (opcional, ou por data se você tivesse)
         renderizarTabela();
     } catch (err) {
-        console.error("Erro ao conectar ao Banco de Dados:", err);
+        console.error("Erro ao carregar Banco de Dados:", err);
     }
 }
 
@@ -46,30 +53,25 @@ function renderizarTabela() {
     const totalClicksElem = document.getElementById('totalClicks');
     if (!lista) return;
 
-    // Atualiza Total de Cliques
     if (totalClicksElem) {
         const total = linksGlobais.reduce((acc, curr) => acc + (parseInt(curr.clicks) || 0), 0);
         totalClicksElem.innerText = total;
     }
 
     if (linksGlobais.length === 0) {
-        lista.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:30px; color:#666;">Nenhum link no seu Banco de Dados.</td></tr>`;
+        lista.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:30px; color:#666;">Nenhum link encontrado.</td></tr>`;
         return;
     }
 
-    // Lógica de Paginação
     const inicio = (paginaAtual - 1) * linksPorPagina;
-    const fim = inicio + linksPorPagina;
-    const linksPaginados = linksGlobais.slice(inicio, fim);
+    const linksPaginados = linksGlobais.slice(inicio, inicio + linksPorPagina);
 
     lista.innerHTML = linksPaginados.map(l => `
         <tr>
             <td><a href="/${l.slug}" target="_blank" style="color:#00c896; font-weight:bold;">/${l.slug}</a></td>
             <td style="font-family: monospace; font-size: 13px; color: #ccc;">${l.pix}</td>
             <td>📊 ${l.clicks || 0}</td>
-            <td>
-                <button onclick="deletarLink('${l.slug}')" class="btn-del">Excluir</button>
-            </td>
+            <td><button onclick="deletarLink('${l.slug}')" class="btn-del">Excluir</button></td>
         </tr>
     `).join('');
 
@@ -84,9 +86,7 @@ function renderizarPaginacao() {
         pagContainer.style.cssText = "display:flex; justify-content:center; gap:10px; margin-top:20px;";
         document.querySelector('.links-section').appendChild(pagContainer);
     }
-
     const totalPaginas = Math.ceil(linksGlobais.length / linksPorPagina);
-    
     let html = '';
     for (let i = 1; i <= totalPaginas; i++) {
         const ativo = i === paginaAtual ? "background:#00c896; color:#000;" : "background:#222; color:#fff;";
@@ -95,27 +95,34 @@ function renderizarPaginacao() {
     pagContainer.innerHTML = html;
 }
 
-function mudarPagina(num) {
-    paginaAtual = num;
-    renderizarTabela();
-}
+function mudarPagina(num) { paginaAtual = num; renderizarTabela(); }
 
-// --- 4. CRIAÇÃO DE LINKS ---
+// --- 4. CRIAÇÃO DE LINKS COM VALIDAÇÃO ---
+
+// Bloqueia caracteres especiais enquanto o usuário digita
+document.addEventListener('input', (e) => {
+    if (e.target.id === 'novoSlug' || e.target.id === 'slug') {
+        let val = e.target.value;
+        val = val.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove acentos
+        val = val.replace(/[çÇ]/g, "c"); // Remove cedilha
+        val = val.replace(/[^a-zA-Z0-9-]/g, "-"); // Tudo que não for letra/número vira hífen
+        val = val.replace(/-+/g, "-"); // Evita múltiplos hífens
+        e.target.value = val.toLowerCase();
+    }
+});
 
 async function criar(pixManual = null, slugManual = null) {
     const pix = pixManual || document.getElementById("pix")?.value;
     const customSlug = slugManual || document.getElementById("slug")?.value;
     const token = localStorage.getItem('meupix_token');
+    const msgStatus = document.getElementById('msgStatus');
     
     if (!pix) return alert("Chave PIX obrigatória!");
 
     try {
         const res = await fetch(`${API_URL}/api/links`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-                "Authorization": token || "" 
-            },
+            headers: { "Content-Type": "application/json", "Authorization": token || "" },
             body: JSON.stringify({ pix, customSlug })
         });
 
@@ -123,26 +130,32 @@ async function criar(pixManual = null, slugManual = null) {
 
         if (res.ok) {
             if (token) {
-                alert("Link criado com sucesso!");
-                carregarMeusLinks();
-                document.getElementById('modalNovoLink').style.display = 'none';
+                // Sucesso dentro do Modal
+                if (msgStatus) {
+                    msgStatus.innerText = "✅ Link criado com sucesso!";
+                    msgStatus.style.color = "#00c896";
+                    setTimeout(() => {
+                        document.getElementById('modalNovoLink').style.display = 'none';
+                        msgStatus.innerText = "";
+                        carregarMeusLinks();
+                    }, 1500);
+                }
             } else {
                 exibirResultadoHome(data.slug);
             }
         } else {
-            alert(data.error || "Erro ao criar link.");
+            if (msgStatus) {
+                msgStatus.innerText = "❌ " + (data.error || "Erro ao criar");
+                msgStatus.style.color = "#ff4d4d";
+            } else { alert(data.error); }
         }
-    } catch (err) {
-        alert("Erro de conexão.");
-    }
+    } catch (err) { alert("Erro de conexão."); }
 }
 
-// Chamada exclusiva do botão da Dashboard
 async function criarNovoLink() {
     const pix = document.getElementById('novoPix').value;
     const slug = document.getElementById('novoSlug').value;
     await criar(pix, slug);
-    // Limpa campos
     document.getElementById('novoPix').value = '';
     document.getElementById('novoSlug').value = '';
 }
@@ -163,7 +176,6 @@ function exibirResultadoHome(slug) {
 async function deletarLink(slug) {
     const token = localStorage.getItem('meupix_token');
     if (!confirm(`Deseja excluir /${slug}?`)) return;
-
     await fetch(`${API_URL}/api/links?slug=${slug}`, {
         method: 'DELETE',
         headers: { 'Authorization': token }
@@ -180,8 +192,9 @@ function copiarLink() {
     });
 }
 
-// Inicialização
+// Inicialização Única
 window.addEventListener('DOMContentLoaded', () => {
+    injetarFavicon();
     if (window.location.pathname.includes('dashboard')) {
         carregarMeusLinks();
     }
