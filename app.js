@@ -54,9 +54,8 @@ async function autenticar(e, tipo) {
 
 // --- 4. GESTÃO DE LINKS ---
 
-// 🏆 Função Inteligente (Home ou Dashboard)
 async function criar(pixManual = null, slugManual = null) {
-    // 🔍 Tenta pegar primeiro do modal, se não existir, pega da home
+    // 🔍 Busca inteligente de elementos (suporta Home e Modal do Dashboard)
     const pix = pixManual || document.getElementById("novoPix")?.value || document.getElementById("pix")?.value;
     const customSlug = slugManual || document.getElementById("novoSlug")?.value;
     const token = localStorage.getItem('meupix_token');
@@ -76,19 +75,19 @@ async function criar(pixManual = null, slugManual = null) {
         const data = await res.json();
 
         if (res.ok) {
-            // 🎨 Manipula o card de resultado (Home e Dashboard)
             const container = document.getElementById("container-resultado");
             const linkElem = document.getElementById("link-gerado");
             
             if (container && linkElem) {
                 container.style.display = "block";
                 const host = window.location.host; 
-                linkElem.innerText = `${host}/${data.slug}`;
-                linkElem.href = `/${data.slug}`;
                 
-                // Se estiver no dashboard, atualiza a lista e fecha o modal
+                // ✅ Link formatado para passar pelo Redirecionador do Worker
+                linkElem.innerText = `${host}/${data.slug}`;
+                linkElem.href = `https://${host}/${data.slug}`;
+                
                 if (token) {
-                    carregarMeusLinks();
+                    carregarMeusLinks(); // Atualiza a tabela no Banco de Dados
                     const modal = document.getElementById('modalNovoLink');
                     if (modal) modal.style.display = 'none';
                 }
@@ -96,23 +95,18 @@ async function criar(pixManual = null, slugManual = null) {
         } else {
             alert(data.error || "Erro ao criar link.");
         }
-
     } catch (err) {
         alert("Erro ao conectar com o servidor.");
     }
 }
 
-// 👑 Função auxiliar para o Modal do Dashboard
 async function criarNovoLink() {
     const pix = document.getElementById('novoPix').value;
     const slug = document.getElementById('novoSlug').value;
-    
     if(!pix) return alert("Insira uma chave PIX!");
     
-    // Passa os valores direto para a função criar
     await criar(pix, slug);
     
-    // Limpa o modal para a próxima
     document.getElementById('novoPix').value = '';
     document.getElementById('novoSlug').value = '';
 }
@@ -121,14 +115,18 @@ async function carregarMeusLinks() {
     const token = verificarSessao();
     if (!token) return;
 
-    const res = await fetch(`${API_URL}/api/links`, {
-        headers: { 'Authorization': token }
-    });
+    try {
+        const res = await fetch(`${API_URL}/api/links`, {
+            headers: { 'Authorization': token }
+        });
 
-    if (res.status === 401) return logout();
+        if (res.status === 401) return logout();
 
-    const links = await res.json();
-    renderizarTabela(links);
+        const links = await res.json();
+        renderizarTabela(links);
+    } catch (err) {
+        console.error("Erro ao carregar links:", err);
+    }
 }
 
 function renderizarTabela(links) {
@@ -137,7 +135,7 @@ function renderizarTabela(links) {
     if (!lista) return;
 
     if (totalClicksElem) {
-        const total = links.reduce((acc, curr) => acc + (curr.clicks || 0), 0);
+        const total = links.reduce((acc, curr) => acc + (parseInt(curr.clicks) || 0), 0);
         totalClicksElem.innerText = total;
     }
 
@@ -171,19 +169,20 @@ async function deletarLink(slug) {
 
         if (res.ok) {
             alert("Link removido!");
-            carregarMeusLinks(); // Recarrega a tabela
+            carregarMeusLinks();
         } else {
-            const err = await res.json();
-            alert(err.error || "Erro ao excluir");
+            const data = await res.json();
+            alert(data.error || "Erro ao excluir");
         }
     } catch (err) {
         alert("Erro de conexão ao excluir.");
     }
 }
 
-// --- 5. ELEMENTOS GLOBAIS ---
+// --- 5. ELEMENTOS GLOBAIS E INICIALIZAÇÃO ---
 
 function injetarElementosGlobais() {
+    // Favicon
     let fav = document.querySelector("link[rel~='icon']");
     if (!fav) {
         fav = document.createElement('link');
@@ -192,6 +191,7 @@ function injetarElementosGlobais() {
     }
     fav.href = '/assets/meupix-logo.png'; 
 
+    // Header Dinâmico
     const token = localStorage.getItem('meupix_token');
     const headerAction = document.getElementById('header-actions');
     
@@ -214,14 +214,24 @@ function copiarLink() {
     const link = document.getElementById('link-gerado').innerText;
     navigator.clipboard.writeText(link).then(() => {
         const btn = document.querySelector("#container-resultado button");
-        const originalText = btn.innerText;
-        btn.innerText = "Copiado!";
-        btn.style.background = "#fff";
-        setTimeout(() => {
-            btn.innerText = originalText;
-            btn.style.background = "#00c896";
-        }, 2000);
+        if (btn) {
+            const originalText = btn.innerText;
+            btn.innerText = "Copiado!";
+            btn.style.background = "#fff";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#00c896";
+            }, 2000);
+        }
     });
 }
 
-window.addEventListener('DOMContentLoaded', injetarElementosGlobais);
+// ✅ Inicializador Único
+window.addEventListener('DOMContentLoaded', () => {
+    injetarElementosGlobais();
+    
+    // Se estiver no dashboard, carrega os dados do Banco de Dados automaticamente
+    if (window.location.pathname.includes('dashboard')) {
+        carregarMeusLinks();
+    }
+});
