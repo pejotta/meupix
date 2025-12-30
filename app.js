@@ -161,4 +161,18 @@ function injetarElementosGlobais() {
     }
 }
 
+function copiarLink() {
+    const link = document.getElementById('link-gerado').innerText;
+    navigator.clipboard.writeText(link).then(() => {
+        const btn = document.querySelector("#container-resultado button");
+        const originalText = btn.innerText;
+        btn.innerText = "Copiado!";
+        btn.style.background = "#fff";
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "#00c896";
+        }, 2000);
+    });
+}
+
 window.addEventListener('DOMContentLoaded', injetarElementosGlobais);
