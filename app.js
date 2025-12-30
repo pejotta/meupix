@@ -14,7 +14,7 @@ function injetarFavicon() {
         fav.rel = 'icon';
         document.head.appendChild(fav);
     }
-    fav.href = '/assets/meupix-logo.png'; 
+    fav.href = '/assets/pixplus-logo.png'; 
 }
 
 function verificarSessao() {
