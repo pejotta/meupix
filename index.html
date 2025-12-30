@@ -13,11 +13,12 @@
         <nav class="nav-container">
             <div class="logo"><a href="/" target="_top"><img src="/assets/meupix-carimbo-branco.png" alt="MeuPIX — Encurtador de Chaves PIX Inteligente" text="MeuPIX — Encurtador de Chaves PIX Inteligente"/></a></div>
             <ul class="nav-links">
-                <li><a href="#vantagens">Vantagens</a></li>
-                <li><a href="#planos">Planos</a></li>
-                <li><a href="#modelos">Modelos</a></li>
-                <li><a href="/login" class="btn-login">Entrar</a></li>
-            </ul>
+    <li><a href="#vantagens">Vantagens</a></li>
+    <li><a href="#planos">Planos</a></li>
+    <li id="header-actions">
+        <a href="/login.html" class="btn-login">Entrar</a>
+    </li>
+</ul>
         </nav>
     </header>
 
@@ -29,7 +30,15 @@
             <div class="generator-box">
                 <input type="text" id="pix" placeholder="Cole sua chave PIX aqui...">
                 <button onclick="criar()">Gerar Link Grátis</button>
-                <div id="resultado"></div>
+                <div id="container-resultado" style="display:none; margin-top: 20px;">
+    <div style="background: #111; border: 1px solid #00c896; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <p style="color: #888; margin: 0; font-size: 14px;">Link gerado com sucesso!</p>
+            <a href="#" id="link-gerado" target="_blank" style="color: #00c896; font-weight: bold; font-size: 18px; text-decoration: none;">meupix.com/nome</a>
+        </div>
+        <button onclick="copiarLink()" style="background: #00c896; color: #000; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold;">Copiar</button>
+    </div>
+</div>
             </div>
             <small>Visitantes podem gerar 1 link aleatório por vez.</small>
         </section>
