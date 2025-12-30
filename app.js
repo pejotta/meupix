@@ -167,6 +167,17 @@ async function deletarLink(slug) {
 // --- 5. ELEMENTOS GLOBAIS ---
 
 function injetarElementosGlobais() {
+    // 1. 🎨 Injetar Favicon (A marca do Pejotta!)
+    let fav = document.querySelector("link[rel~='icon']");
+    if (!fav) {
+        fav = document.createElement('link');
+        fav.rel = 'icon';
+        document.getElementsByTagName('head')[0].appendChild(fav);
+    }
+    // Verifique se o nome do arquivo é meupix-logo.png ou se prefere usar o carimbo-preto
+    fav.href = '/assets/meupix-carimbo-preto.png'; 
+
+    // 2. 👑 Header Dinâmico (Login/Painel)
     const token = localStorage.getItem('meupix_token');
     const headerAction = document.getElementById('header-actions');
     
