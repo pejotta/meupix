@@ -1,7 +1,7 @@
 // 1. Configuração Única da API
 // Se o Worker e o Pages estão no mesmo domínio, deixe apenas ""
 // Se forem domínios diferentes, use a URL completa: "https://meupix-api.moneynanet-yt.workers.dev"
-const API_URL = ""; 
+const API_URL = "https://meupix-api.moneynanet-yt.workers.dev";
 
 // --- 2. FUNÇÕES DE NAVEGAÇÃO E AUTH ---
 
