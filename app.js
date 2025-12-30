@@ -179,7 +179,7 @@ function injetarElementosGlobais() {
         fav.rel = 'icon';
         document.head.appendChild(fav);
     }
-    fav.href = '/assets/meupix-carimbo-preto.png'; 
+    fav.href = '/assets/meupix-logo.png'; 
 
     const token = localStorage.getItem('meupix_token');
     const headerAction = document.getElementById('header-actions');
