@@ -244,3 +244,15 @@ window.addEventListener('DOMContentLoaded', () => {
         carregarMeusLinks();
     }
 });
+
+function trocarAba(aba) {
+    // 1. Esconde todas as abas
+    document.querySelectorAll('.aba-conteudo').forEach(div => div.style.display = 'none');
+    
+    // 2. Remove o 'active' de todos os itens do menu
+    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+
+    // 3. Mostra a aba clicada e ativa o menu
+    document.getElementById(`view-${aba}`).style.display = 'block';
+    document.getElementById(`nav-${aba}`).classList.add('active');
+}
