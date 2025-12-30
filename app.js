@@ -336,3 +336,14 @@ window.addEventListener('DOMContentLoaded', () => {
         carregarBoasVindas();
     }
 });
+// Listener Global para o Menu Sanduíche
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.menu-toggle-btn');
+    const overlay = document.querySelector('.menu-overlay');
+    const sidebar = document.querySelector('.sidebar');
+
+    if (btn || e.target.classList.contains('menu-overlay')) {
+        sidebar?.classList.toggle('active');
+        overlay?.classList.toggle('active');
+    }
+});
