@@ -6,7 +6,7 @@
     <title>Dashboard - MeuPIX</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        :root { --primary: #00c896; --bg: #0b0b0b; --sidebar: #161616; }
+        :root { --primary: #00c896; --bg: #0b0b0b; --sidebar: #161616; --card: #1e1e1e; }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; display: flex; }
 
         /* --- SIDEBAR RESPONSIVA --- */
@@ -14,12 +14,12 @@
             width: 260px; background: var(--sidebar); height: 100vh; 
             padding: 30px 20px; border-right: 1px solid #222;
             position: fixed; transition: 0.3s; z-index: 1000;
+            display: flex; flex-direction: column;
         }
 
-        /* Esconde a sidebar no mobile por padrão */
         @media (max-width: 768px) {
-            .sidebar { left: -100%; } /* Joga pra fora da tela esquerda */
-            .sidebar.active { left: 0; } /* Traz de volta */
+            .sidebar { left: -100%; }
+            .sidebar.active { left: 0; }
         }
 
         .logo { width: 130px; margin-bottom: 40px; }
@@ -27,16 +27,16 @@
         .nav-link { 
             display: flex; align-items: center; padding: 12px; 
             color: #888; text-decoration: none; border-radius: 10px; margin-bottom: 5px;
-            transition: 0.2s;
+            transition: 0.2s; cursor: pointer;
         }
         .nav-link:hover, .nav-link.active { background: #222; color: var(--primary); }
 
-        /* --- BOTÃO SANDUÍCHE (Só aparece no Mobile) --- */
+        /* --- HEADER MOBILE --- */
         .mobile-header {
             display: none; width: 100%; background: var(--sidebar);
             padding: 15px 20px; border-bottom: 1px solid #222;
             justify-content: space-between; align-items: center;
-            position: fixed; top: 0; z-index: 1100;
+            position: fixed; top: 0; z-index: 1100; box-sizing: border-box;
         }
 
         @media (max-width: 768px) {
@@ -44,88 +44,120 @@
             .main-content { margin-left: 0 !important; padding-top: 80px !important; }
         }
 
-        .menu-toggle {
-            background: none; border: none; color: var(--primary);
-            font-size: 24px; cursor: pointer;
-        }
+        .menu-toggle { background: none; border: none; color: var(--primary); font-size: 24px; cursor: pointer; }
 
-        /* --- CONTEÚDO PRINCIPAL --- */
-        .main-content { flex: 1; margin-left: 260px; padding: 40px; transition: 0.3s; }
+        /* --- CONTEÚDO --- */
+        .main-content { flex: 1; margin-left: 260px; padding: 40px; transition: 0.3s; width: 100%; }
 
         .welcome-card { background: linear-gradient(135deg, #1e1e1e, #111); padding: 30px; border-radius: 20px; border: 1px solid #222; margin-bottom: 30px; }
         
-        /* Overlay para fechar o menu ao clicar fora */
-        .overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 900;
-        }
+        /* Estilo da Tabela de Links */
+        .links-container { background: var(--sidebar); border-radius: 15px; padding: 20px; border: 1px solid #222; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; color: #ccc; }
+        th { text-align: left; padding: 12px; border-bottom: 1px solid #333; color: var(--primary); }
+        td { padding: 12px; border-bottom: 1px solid #222; }
+
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 900; }
         .overlay.active { display: block; }
     </style>
 </head>
 <body>
 
     <div class="mobile-header">
-        <img src="/assets/meupix-carimbo-branco.png" alt="MeuPIX" style="height: 30px;">
+        <img src="https://meupix.pages.dev/assets/meupix-carimbo-white.png" alt="MeuPIX" style="height: 30px;">
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     </div>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
     <nav class="sidebar" id="sidebar">
-        <img src="/assets/meupix-carimbo-branco.png" alt="MeuPIX" class="logo">
+        <img src="https://meupix.pages.dev/assets/meupix-carimbo-white.png" alt="MeuPIX" class="logo">
         
-        <a href="#" class="nav-link active" onclick="showView('home')">🏠 Início</a>
-        <a href="#" class="nav-link" onclick="showView('links')">🔗 Meus Links</a>
-        <a href="#" class="nav-link" onclick="showView('perfil')">👤 Perfil</a>
+        <div class="nav-links">
+            <a class="nav-link active" onclick="showView('home')">🏠 Início</a>
+            <a class="nav-link" onclick="showView('links')">🔗 Meus Links</a>
+            <a class="nav-link" onclick="showView('criar')">➕ Criar Novo Link</a>
+            <a class="nav-link" onclick="showView('perfil')">👤 Perfil</a>
+            <a class="nav-link" onclick="showView('config')">⚙️ Configurações</a>
+        </div>
         
-        <div style="position: absolute; bottom: 30px; width: calc(100% - 40px);">
-            <a href="#" class="nav-link" onclick="sair()" style="color: #ff4d4d;">🚪 Sair</a>
+        <div style="margin-top: auto;">
+            <a class="nav-link" onclick="sair()" style="color: #ff4d4d;">🚪 Sair</a>
         </div>
     </nav>
 
     <main class="main-content">
         <div id="view-home" class="view">
             <div class="welcome-card">
-                <h1 id="welcome-text">Bem-vindo, Pejotta!</h1>
-                <p style="color: #888;">Seu ecossistema PIX está operando normalmente.</p>
+                <h1 id="welcome-text">Carregando...</h1>
+                <p style="color: #888;">Bem-vindo ao seu painel administrativo.</p>
             </div>
         </div>
 
         <div id="view-links" class="view" style="display:none;">
-            <h2>Seus Links Gerados</h2>
-            <div id="lista-links">
-                </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Seus Links Ativos</h2>
+                <button onclick="showView('criar')" style="background: var(--primary); border:none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer;">+ Novo</button>
+            </div>
+            <div class="links-container">
+                <table id="tabela-links">
+                    <thead>
+                        <tr>
+                            <th>Slug (Caminho)</th>
+                            <th>Chave PIX</th>
+                            <th>Cliques</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-links">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="view-criar" class="view" style="display:none;">
+            <h2>Criar Novo Link PIX</h2>
+            <div class="welcome-card" style="max-width: 500px;">
+                <input type="text" id="pixKey" placeholder="Sua Chave PIX" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #333; background:#000; color:#fff;">
+                <input type="text" id="customSlug" placeholder="Slug personalizado (ex: meu-pagamento)" style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:1px solid #333; background:#000; color:#fff;">
+                <button onclick="gerarLink()" style="width:100%; padding:15px; background:var(--primary); border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Gerar Link Profissional</button>
+            </div>
         </div>
     </main>
 
     <script>
-        // Lógica do Menu Sanduíche
         function toggleMenu() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
         }
 
-        // Troca de abas (Views)
         function showView(viewName) {
+            // Esconde todas as views
             document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
-            document.getElementById('view-' + viewName).style.display = 'block';
+            // Remove active de todos os links
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             
-            // Fecha o menu no mobile após clicar em um link
-            if (window.innerWidth <= 768) toggleMenu();
+            // Mostra a selecionada
+            document.getElementById('view-' + viewName).style.display = 'block';
+            event.currentTarget.classList.add('active');
+            
+            // Fecha menu no mobile
+            if (window.innerWidth <= 768 && document.getElementById('sidebar').classList.contains('active')) {
+                toggleMenu();
+            }
         }
 
-        // Função de Sair (Pejotta, lembra de camuflar o login no app.js!)
         function sair() {
             localStorage.removeItem('meupix_token');
             localStorage.removeItem('meupix_user_name');
             window.location.href = 'login.html';
         }
 
-        // Pegar nome do Banco de Dados
-        window.onload = () => {
+        // Recupera o nome para as boas-vindas
+        window.addEventListener('DOMContentLoaded', () => {
             const nome = localStorage.getItem('meupix_user_name') || 'Pejotta';
             document.getElementById('welcome-text').innerText = `Bem-vindo, ${nome.split(' ')[0]}!`;
-        };
+        });
     </script>
     <script src="app.js"></script>
 </body>
