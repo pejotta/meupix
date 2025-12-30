@@ -2,53 +2,47 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>MeuPIX - Entrar ou Criar Conta</title>
+    <title>MeuPIX - Entrar</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        :root { --primary: #00c896; --bg: #0b0b0b; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; }
         .auth-container { max-width: 400px; margin: 100px auto; padding: 40px; background: #161616; border-radius: 20px; border: 1px solid #222; text-align: center; }
-        .social-btns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-        .btn-google { background: #fff; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .divider { margin: 20px 0; color: #555; display: flex; align-items: center; gap: 10px; }
-        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #333; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; }
-        .btn-primary { width: 100%; padding: 12px; background: #00c896; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .switch-auth { margin-top: 20px; font-size: 14px; color: #888; }
-        .switch-auth a { color: #00c896; text-decoration: none; }
+        
+        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--primary); }
+        
+        .btn-primary { width: 100%; padding: 12px; background: var(--primary); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+        
+        .switch-auth { margin-top: 25px; font-size: 14px; color: #888; }
+        .switch-auth a { color: var(--primary); text-decoration: none; font-weight: bold; }
+        
+        .forgot-password { display: block; margin-bottom: 15px; text-align: right; font-size: 13px; color: #666; text-decoration: none; }
+        .forgot-password:hover { color: var(--primary); }
     </style>
 </head>
 <body>
     <div class="auth-container">
+        <a href="/"><img src="/assets/meupix-carimbo-branco.png" alt="MeuPIX" style="height: 40px; margin-bottom: 20px;"></a>
         <h2 id="auth-title">Bem-vindo de volta</h2>
         <p style="color: #888; margin-bottom: 30px;">Gerencie seus links PIX de forma profissional.</p>
 
-       <form id="loginForm" onsubmit="event.preventDefault(); logar();">
-    <input type="email" id="email" placeholder="E-mail" required>
-    <input type="password" id="password" placeholder="Senha" required>
-    <button type="submit">Entrar</button>
-</form>
+        <form id="loginForm" onsubmit="event.preventDefault(); logar();">
+            <input type="email" id="email" placeholder="E-mail" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            
+            <a href="#" onclick="alert('Função em desenvolvimento!')" class="forgot-password">Esqueceu a senha?</a>
+            
+            <button type="submit" class="btn-primary">Entrar</button>
+        </form>
 
         <div class="switch-auth">
-            <span id="switch-text">Não tem uma conta?</span> 
-            <a href="#" id="toggle-auth">Cadastre-se</a>
+            <span>Não tem uma conta?</span> 
+            <a href="cadastro.html">Cadastre-se</a>
         </div>
     </div>
 
-    <script>
-        const toggle = document.getElementById('toggle-auth');
-        const title = document.getElementById('auth-title');
-        const btnText = document.getElementById('btn-text');
-        const switchText = document.getElementById('switch-text');
-        let isLogin = true;
-
-        toggle.onclick = (e) => {
-            e.preventDefault();
-            isLogin = !isLogin;
-            title.innerText = isLogin ? 'Bem-vindo de volta' : 'Crie sua conta';
-            btnText.innerText = isLogin ? 'Entrar' : 'Começar Agora';
-            switchText.innerText = isLogin ? 'Não tem uma conta?' : 'Já possui conta?';
-            toggle.innerText = isLogin ? 'Cadastre-se' : 'Entrar';
-        };
-    </script>
     <script src="app.js"></script>
 </body>
 </html>
