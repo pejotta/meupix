@@ -54,10 +54,10 @@ async function autenticar(e, tipo) {
 
 // --- 4. GESTÃO DE LINKS ---
 
-// 🏆 Função Única para criar links (Home ou Dashboard)
+// 🏆 Função Inteligente (Home ou Dashboard)
 async function criar(pixManual = null, slugManual = null) {
-    // Busca dados dos inputs (Home usa 'pix', Dashboard usa o que vem do modal)
-    const pix = pixManual || document.getElementById("pix")?.value;
+    // 🔍 Tenta pegar primeiro do modal, se não existir, pega da home
+    const pix = pixManual || document.getElementById("novoPix")?.value || document.getElementById("pix")?.value;
     const customSlug = slugManual || document.getElementById("novoSlug")?.value;
     const token = localStorage.getItem('meupix_token');
     
@@ -75,23 +75,30 @@ async function criar(pixManual = null, slugManual = null) {
 
         const data = await res.json();
 
-        // 🎨 Exibe o card de resultado igual ao seu print
-        const container = document.getElementById("container-resultado");
-        const linkElem = document.getElementById("link-gerado");
-        
-        if (container && linkElem) {
-            container.style.display = "block";
-            // Remove o protocolo para ficar limpo igual ao print
-            const host = window.location.host; 
-            linkElem.innerText = `${host}/${data.slug}`;
-            linkElem.href = `/${data.slug}`;
+        if (res.ok) {
+            // 🎨 Manipula o card de resultado (Home e Dashboard)
+            const container = document.getElementById("container-resultado");
+            const linkElem = document.getElementById("link-gerado");
             
-            // Se estiver no dashboard, recarrega a lista
-            if (token) carregarMeusLinks();
+            if (container && linkElem) {
+                container.style.display = "block";
+                const host = window.location.host; 
+                linkElem.innerText = `${host}/${data.slug}`;
+                linkElem.href = `/${data.slug}`;
+                
+                // Se estiver no dashboard, atualiza a lista e fecha o modal
+                if (token) {
+                    carregarMeusLinks();
+                    const modal = document.getElementById('modalNovoLink');
+                    if (modal) modal.style.display = 'none';
+                }
+            }
+        } else {
+            alert(data.error || "Erro ao criar link.");
         }
 
     } catch (err) {
-        alert("Erro ao criar link. Tente novamente.");
+        alert("Erro ao conectar com o servidor.");
     }
 }
 
@@ -102,10 +109,10 @@ async function criarNovoLink() {
     
     if(!pix) return alert("Insira uma chave PIX!");
     
+    // Passa os valores direto para a função criar
     await criar(pix, slug);
     
-    // Limpa e fecha o modal
-    document.getElementById('modalNovoLink').style.display = 'none';
+    // Limpa o modal para a próxima
     document.getElementById('novoPix').value = '';
     document.getElementById('novoSlug').value = '';
 }
@@ -129,7 +136,6 @@ function renderizarTabela(links) {
     const totalClicksElem = document.getElementById('totalClicks');
     if (!lista) return;
 
-    // Soma todos os cliques para o Dashboard
     if (totalClicksElem) {
         const total = links.reduce((acc, curr) => acc + (curr.clicks || 0), 0);
         totalClicksElem.innerText = total;
@@ -146,7 +152,7 @@ function renderizarTabela(links) {
             <td>${l.pix.substring(0, 15)}...</td>
             <td>📊 ${l.clicks || 0}</td>
             <td>
-                <button onclick="deletarLink('${l.slug}')" class="btn-del">Excluir</button>
+                <button onclick="deletarLink('${l.slug}')" class="btn-del" style="color:#ff4d4d; background:none; border:none; cursor:pointer;">Excluir</button>
             </td>
         </tr>
     `).join('');
@@ -167,17 +173,14 @@ async function deletarLink(slug) {
 // --- 5. ELEMENTOS GLOBAIS ---
 
 function injetarElementosGlobais() {
-    // 1. 🎨 Injetar Favicon (A marca do Pejotta!)
     let fav = document.querySelector("link[rel~='icon']");
     if (!fav) {
         fav = document.createElement('link');
         fav.rel = 'icon';
-        document.getElementsByTagName('head')[0].appendChild(fav);
+        document.head.appendChild(fav);
     }
-    // Verifique se o nome do arquivo é meupix-logo.png ou se prefere usar o carimbo-preto
-    fav.href = '/assets/meupix-logo.png'; 
+    fav.href = '/assets/meupix-carimbo-preto.png'; 
 
-    // 2. 👑 Header Dinâmico (Login/Painel)
     const token = localStorage.getItem('meupix_token');
     const headerAction = document.getElementById('header-actions');
     
