@@ -1,6 +1,3 @@
-// 1. Configuração Única da API
-// Se o Worker e o Pages estão no mesmo domínio, deixe apenas ""
-// Se forem domínios diferentes, use a URL completa: "https://meupix-api.moneynanet-yt.workers.dev"
 const API_URL = "https://meupix-api.moneynanet-yt.workers.dev";
 
 // --- 2. FUNÇÕES DE NAVEGAÇÃO E AUTH ---
@@ -45,7 +42,6 @@ async function autenticar(e, tipo) {
                 salvarSessao(data.token);
             } else {
                 alert('Conta criada com sucesso! Agora é só fazer login.');
-                // Se estiver no login.html, apenas alterna a visualização ou recarrega
                 window.location.reload(); 
             }
         } else {
@@ -58,29 +54,60 @@ async function autenticar(e, tipo) {
 
 // --- 4. GESTÃO DE LINKS ---
 
-async function criar() {
-    const pix = document.getElementById("pix").value;
+// 🏆 Função Única para criar links (Home ou Dashboard)
+async function criar(pixManual = null, slugManual = null) {
+    // Busca dados dos inputs (Home usa 'pix', Dashboard usa o que vem do modal)
+    const pix = pixManual || document.getElementById("pix")?.value;
+    const customSlug = slugManual || document.getElementById("novoSlug")?.value;
     const token = localStorage.getItem('meupix_token');
     
     if (!pix) return alert("Chave PIX obrigatória!");
 
-    // Se o cara estiver logado, enviamos o token para salvar no painel dele
     const headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = token;
 
-    const res = await fetch(`${API_URL}/api/links`, {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify({ pix })
-    });
+    try {
+        const res = await fetch(`${API_URL}/api/links`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({ pix, customSlug })
+        });
 
-    const data = await res.json();
-    document.getElementById("resultado").innerHTML = `
-        <div class="success-box" style="margin-top:20px; padding:15px; background:#121212; border-radius:10px; border:1px solid #00c896;">
-            <p>Link gerado com sucesso!</p>
-            <a href="/${data.slug}" target="_blank" style="color:#00c896; font-weight:bold;">meupix.com/${data.slug}</a>
-        </div>
-    `;
+        const data = await res.json();
+
+        // 🎨 Exibe o card de resultado igual ao seu print
+        const container = document.getElementById("container-resultado");
+        const linkElem = document.getElementById("link-gerado");
+        
+        if (container && linkElem) {
+            container.style.display = "block";
+            // Remove o protocolo para ficar limpo igual ao print
+            const host = window.location.host; 
+            linkElem.innerText = `${host}/${data.slug}`;
+            linkElem.href = `/${data.slug}`;
+            
+            // Se estiver no dashboard, recarrega a lista
+            if (token) carregarMeusLinks();
+        }
+
+    } catch (err) {
+        alert("Erro ao criar link. Tente novamente.");
+    }
+}
+
+// 👑 Função auxiliar para o Modal do Dashboard
+async function criarNovoLink() {
+    const pix = document.getElementById('novoPix').value;
+    const slug = document.getElementById('novoSlug').value;
+    
+    if(!pix) return alert("Insira uma chave PIX!");
+    
+    await criar(pix, slug);
+    
+    // Limpa e fecha o modal
+    document.getElementById('modalNovoLink').style.display = 'none';
+    document.getElementById('novoPix').value = '';
+    document.getElementById('novoSlug').value = '';
 }
 
 async function carregarMeusLinks() {
@@ -99,7 +126,14 @@ async function carregarMeusLinks() {
 
 function renderizarTabela(links) {
     const lista = document.getElementById('linksBody');
+    const totalClicksElem = document.getElementById('totalClicks');
     if (!lista) return;
+
+    // Soma todos os cliques para o Dashboard
+    if (totalClicksElem) {
+        const total = links.reduce((acc, curr) => acc + (curr.clicks || 0), 0);
+        totalClicksElem.innerText = total;
+    }
 
     if (links.length === 0) {
         lista.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:30px; color:#666;">Você ainda não tem links criados.</td></tr>`;
@@ -108,11 +142,11 @@ function renderizarTabela(links) {
 
     lista.innerHTML = links.map(l => `
         <tr>
-            <td><a href="/${l.slug}" target="_blank" style="color:#00c896;">/${l.slug}</a></td>
+            <td><a href="/${l.slug}" target="_blank" style="color:#00c896; font-weight:bold;">/${l.slug}</a></td>
             <td>${l.pix.substring(0, 15)}...</td>
-            <td>🔥 ${l.clicks || 0}</td>
+            <td>📊 ${l.clicks || 0}</td>
             <td>
-                <button onclick="deletarLink('${l.slug}')" class="btn-del" style="color:#ff4d4d; background:none; border:none; cursor:pointer;">Excluir</button>
+                <button onclick="deletarLink('${l.slug}')" class="btn-del">Excluir</button>
             </td>
         </tr>
     `).join('');
@@ -133,29 +167,19 @@ async function deletarLink(slug) {
 // --- 5. ELEMENTOS GLOBAIS ---
 
 function injetarElementosGlobais() {
-    // 1. Injetar Favicon
-    let link = document.querySelector("link[rel~='icon']");
-    if (!link) {
-        link = document.createElement('link');
-        link.rel = 'icon';
-        document.getElementsByTagName('head')[0].appendChild(link);
-    }
-    link.href = '/assets/meupix-logo.png';
-
-    // 2. Header Dinâmico
     const token = localStorage.getItem('meupix_token');
     const headerAction = document.getElementById('header-actions');
     
     if (headerAction) {
         if (token) {
             headerAction.innerHTML = `
-                <a href="/dashboard.html" style="margin-right:15px; color:#fff; text-decoration:none;">Painel</a>
-                <button onclick="logout()" style="background:#333; color:#fff; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Sair</button>
+                <a href="/dashboard.html" style="margin-right:15px; color:#fff; text-decoration:none; font-size:14px;">Painel</a>
+                <button onclick="logout()" style="background:#222; color:#fff; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;">Sair</button>
             `;
         } else {
             headerAction.innerHTML = `
-                <a href="/login.html" style="margin-right:15px; color:#fff; text-decoration:none;">Entrar</a>
-                <a href="/login.html" style="background:#00c896; color:#000; border:none; padding:8px 15px; border-radius:5px; text-decoration:none; font-weight:bold;">Criar Conta</a>
+                <a href="/login.html" style="margin-right:15px; color:#fff; text-decoration:none; font-size:14px;">Entrar</a>
+                <a href="/login.html" style="background:#00c896; color:#000; border:none; padding:8px 15px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:14px;">Começar</a>
             `;
         }
     }
