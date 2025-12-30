@@ -21,9 +21,9 @@
         <h2 id="auth-title">Bem-vindo de volta</h2>
         <p style="color: #888; margin-bottom: 30px;">Gerencie seus links PIX de forma profissional.</p>
 
-        <form onsubmit="autenticar(event, isLogin ? 'login' : 'register')">
-    <input name="email" type="email" placeholder="Seu e-mail" required>
-    <input name="password" type="password" placeholder="Sua senha" required>
+       <form id="loginForm" onsubmit="event.preventDefault(); logar();">
+    <input type="email" id="email" placeholder="E-mail" required>
+    <input type="password" id="password" placeholder="Senha" required>
     <button type="submit">Entrar</button>
 </form>
 
