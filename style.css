@@ -145,8 +145,8 @@ header {
 .featured .btn-plan { background: var(--primary); color: #000; }
 
 /* Footer */
-footer { padding: 50px 5%; border-top: 1px solid #222; text-align: center; }
-.footer-content p { color: var(--text-dim); margin: 20px 0; display: flex;
+footer { padding: 50px 5%; border-top: 1px solid #222; text-align: center;  display: flex;
     justify-content: space-between;
     flex-wrap: nowrap;
     align-items: center; }
+.footer-content p { color: var(--text-dim); margin: 20px 0;}
