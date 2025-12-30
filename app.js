@@ -175,7 +175,7 @@ function injetarElementosGlobais() {
         document.getElementsByTagName('head')[0].appendChild(fav);
     }
     // Verifique se o nome do arquivo é meupix-logo.png ou se prefere usar o carimbo-preto
-    fav.href = '/assets/meupix-carimbo-preto.png'; 
+    fav.href = '/assets/meupix-logo.png'; 
 
     // 2. 👑 Header Dinâmico (Login/Painel)
     const token = localStorage.getItem('meupix_token');
