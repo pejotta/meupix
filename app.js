@@ -48,6 +48,8 @@ async function carregarMeusLinks() {
     }
 }
 
+// --- 3. GESTÃO DE LINKS (TABELA E PAGINAÇÃO) ---
+
 function renderizarTabela() {
     const lista = document.getElementById('linksBody');
     const totalClicksElem = document.getElementById('totalClicks');
@@ -71,11 +73,54 @@ function renderizarTabela() {
             <td><a href="/${l.slug}" target="_blank" style="color:#00c896; font-weight:bold;">/${l.slug}</a></td>
             <td style="font-family: monospace; font-size: 13px; color: #ccc;">${l.pix}</td>
             <td>📊 ${l.clicks || 0}</td>
-            <td><button onclick="deletarLink('${l.slug}')" class="btn-del">Excluir</button></td>
+            <td id="acoes-${l.slug}">
+                <button onclick="confirmarExclusao('${l.slug}')" class="btn-del">Excluir</button>
+            </td>
         </tr>
     `).join('');
 
     renderizarPaginacao();
+}
+
+// Nova lógica de confirmação sem pop-up
+function confirmarExclusao(slug) {
+    const tdAcoes = document.getElementById(`acoes-${slug}`);
+    if (!tdAcoes) return;
+
+    // Transforma o botão em uma confirmação inline
+    tdAcoes.innerHTML = `
+        <div style="display:flex; gap:8px; align-items:center;">
+            <span style="color:#ff4d4d; font-size:11px; font-weight:bold;">Apagar?</span>
+            <button onclick="executarExclusao('${slug}')" style="background:#ff4d4d; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">Sim</button>
+            <button onclick="renderizarTabela()" style="background:#333; color:#fff; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:11px;">Não</button>
+        </div>
+    `;
+}
+
+async function executarExclusao(slug) {
+    const token = localStorage.getItem('meupix_token');
+    const tdAcoes = document.getElementById(`acoes-${slug}`);
+    
+    if (tdAcoes) tdAcoes.innerHTML = `<span style="color:#888; font-size:11px;">Excluindo...</span>`;
+
+    try {
+        const res = await fetch(`${API_URL}/api/links?slug=${slug}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': token }
+        });
+
+        if (res.ok) {
+            // Remove do array local e re-renderiza
+            linksGlobais = linksGlobais.filter(l => l.slug !== slug);
+            renderizarTabela();
+        } else {
+            alert("Erro ao excluir do Banco de Dados.");
+            renderizarTabela();
+        }
+    } catch (err) {
+        console.error(err);
+        renderizarTabela();
+    }
 }
 
 function renderizarPaginacao() {
