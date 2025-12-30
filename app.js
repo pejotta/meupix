@@ -290,7 +290,14 @@ async function cadastrar() {
     const senha = document.getElementById('password').value;
     const confirma = document.getElementById('confirmPassword').value;
 
-    if (senha !== confirma) return alert("As senhas não conferem!");
+    // Validação básica antes de gastar internet kkk
+    if (senha !== confirma) {
+        return alert("As senhas não conferem, Pejotta! Dá uma conferida aí. 😉");
+    }
+
+    if (senha.length < 6) {
+        return alert("A senha precisa de pelo menos 6 caracteres.");
+    }
 
     try {
         const res = await fetch(`${API_URL}/api/cadastro`, {
@@ -302,13 +309,13 @@ async function cadastrar() {
         const data = await res.json();
 
         if (res.ok) {
-            alert("Cadastro realizado! Agora faça seu login.");
+            alert("Sucesso! Conta criada. Agora é só logar e faturar!");
             window.location.href = '/login.html';
         } else {
-            alert(data.error || "Erro ao cadastrar.");
+            alert(data.error || "Houve um erro ao cadastrar.");
         }
     } catch (err) {
-        alert("Erro de conexão.");
+        alert("Erro ao conectar com o servidor. O Banco de Dados está online?");
     }
 }
 
