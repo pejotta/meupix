@@ -347,3 +347,25 @@ document.addEventListener('click', (e) => {
         overlay?.classList.toggle('active');
     }
 });
+
+// Função para atualizar o menu da Index conforme o status de login
+function atualizarMenuIndex() {
+    const token = localStorage.getItem('meupix_token');
+    const headerActions = document.getElementById('header-actions');
+
+    if (token && headerActions) {
+        // Se existir um token, o usuário está logado!
+        const nomeUsuario = localStorage.getItem('meupix_user_name') || 'Usuário';
+        const primeiroNome = nomeUsuario.split(' ')[0];
+
+        headerActions.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="color: #888; font-size: 14px; display: none; @media (min-width: 768px) { display: inline; }">Olá, ${primeiroNome}!</span>
+                <a href="/dashboard.html" class="btn-login" style="background: var(--primary); color: #000;">Acessar Painel</a>
+            </div>
+        `;
+    }
+}
+
+// Executa a função assim que a página carrega
+document.addEventListener('DOMContentLoaded', atualizarMenuIndex);
