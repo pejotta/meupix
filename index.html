@@ -23,28 +23,27 @@
     </header>
 
     <main>
-        <section class="hero">
-            <h1>Sua oferta a um clique de distância.</h1>
-            <p>Transforme chaves PIX complexas em links curtos e fáceis de copiar.</p>
-            
-            <div class="generator-box">
-                <div style="display: flex; gap: 10px; width: 100%;">
-                    <input type="text" id="pix" placeholder="Cole sua chave PIX aqui..." style="flex: 1;">
-                    <button onclick="criar()">Gerar Link Grátis</button>
-                </div>
+    <section class="hero">
+        <h1>Sua oferta a um clique de distância.</h1>
+        <p>Transforme chaves PIX complexas em links curtos e fáceis de copiar.</p>
+        
+        <div class="generator-box">
+            <input type="text" id="pix" placeholder="Cole sua chave PIX aqui...">
+            <button onclick="criar()">Gerar Link Grátis</button>
+        </div>
 
-                <div id="container-resultado" style="display:none; margin-top: 20px; width: 100%;">
-                    <div style="background: #111; border: 1px solid #00c896; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
-                        <div style="text-align: left;">
-                            <p style="color: #888; margin: 0; font-size: 14px;">Link gerado com sucesso!</p>
-                            <a href="#" id="link-gerado" target="_blank" style="color: #00c896; font-weight: bold; font-size: 18px; text-decoration: none;">meupix.com/carregando</a>
-                        </div>
-                        <button onclick="copiarLink()" style="background: #00c896; color: #000; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;">Copiar</button>
-                    </div>
+        <div id="container-resultado" style="display:none; margin-top: 20px; max-width: 600px; width: 100%; justify-self: center;">
+            <div style="background: #111; border: 1px solid #00c896; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="text-align: left;">
+                    <p style="color: #888; margin: 0; font-size: 14px;">Link gerado com sucesso!</p>
+                    <a href="#" id="link-gerado" target="_blank" style="color: #00c896; font-weight: bold; font-size: 18px; text-decoration: none;">meupix.pages.dev/carregando</a>
                 </div>
+                <button onclick="copiarLink()" style="background: #00c896; color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold;">Copiar</button>
             </div>
-            <small style="display: block; margin-top: 10px;">Visitantes podem gerar 1 link aleatório por vez.</small>
-        </section>
+        </div>
+
+        <small style="display: block; margin-top: 15px;">Visitantes podem gerar 1 link aleatório por vez.</small>
+    </section>
 
         <section id="vantagens" class="features">
             <div class="section-title">
