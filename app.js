@@ -256,3 +256,76 @@ function trocarAba(aba) {
     document.getElementById(`view-${aba}`).style.display = 'block';
     document.getElementById(`nav-${aba}`).classList.add('active');
 }
+
+// --- LOGIN ---
+async function logar() {
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('password').value;
+
+    try {
+        const res = await fetch(`${API_URL}/api/login`, {
+            method: 'POST', // POST é obrigatório para segurança!
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, senha })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            localStorage.setItem('meupix_token', data.token);
+            localStorage.setItem('meupix_user_name', data.nome); // Salvamos o nome vindo do Banco de Dados
+            window.location.href = '/dashboard.html';
+        } else {
+            alert(data.error || "E-mail ou senha incorretos.");
+        }
+    } catch (err) {
+        alert("Erro ao conectar com o servidor.");
+    }
+}
+
+// --- CADASTRO ---
+async function cadastrar() {
+    const nome = document.getElementById('nome').value;
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('password').value;
+    const confirma = document.getElementById('confirmPassword').value;
+
+    if (senha !== confirma) return alert("As senhas não conferem!");
+
+    try {
+        const res = await fetch(`${API_URL}/api/cadastro`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, email, senha })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert("Cadastro realizado! Agora faça seu login.");
+            window.location.href = '/login.html';
+        } else {
+            alert(data.error || "Erro ao cadastrar.");
+        }
+    } catch (err) {
+        alert("Erro de conexão.");
+    }
+}
+
+// --- BOAS-VINDAS DINÂMICO ---
+function carregarBoasVindas() {
+    const nome = localStorage.getItem('meupix_user_name') || "Usuário";
+    const saudacaoElem = document.querySelector('#view-home h1');
+    if (saudacaoElem) {
+        saudacaoElem.innerText = `Bem-vindo, ${nome.split(' ')[0]}!`; // Pega só o primeiro nome
+    }
+}
+
+// Atualize o listener inicial para carregar o nome
+window.addEventListener('DOMContentLoaded', () => {
+    injetarFavicon();
+    if (window.location.pathname.includes('dashboard')) {
+        carregarMeusLinks();
+        carregarBoasVindas();
+    }
+});
