@@ -45,7 +45,25 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="dash-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="/assets/meupix-carimbo-branco.png" alt="MeuPIX" class="logo-dash">
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" onclick="trocarAba('home')" class="nav-item active" id="nav-home">🏠 Painel</a>
+                <a href="#" onclick="trocarAba('analytics')" class="nav-item" id="nav-analytics">📊 Analytics</a>
+                <a href="#" onclick="trocarAba('modelos')" class="nav-item" id="nav-modelos">🎨 Modelos</a>
+                <a href="#" onclick="trocarAba('planos')" class="nav-item" id="nav-planos">💎 Planos</a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn-logout">Sair</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div id="view-home" class="aba-conteudo">
+                <div class="container">
         <header class="dash-header">
             <div class="user-info">
                <a href="/"><img class="logo-dash" src="/assets/meupix-carimbo-branco.png" alt="MeuPIX"/></a>
@@ -124,6 +142,21 @@
         </div>
     </div>
 
+                </div>
+
+            <div id="view-analytics" class="aba-conteudo" style="display:none">
+                <h2>Analytics</h2>
+                <div class="stat-card">
+                    <div class="lock-overlay">
+                        <span class="lock-icon">🔒</span>
+                        <p>Gráficos detalhados disponíveis no plano PRO</p>
+                    </div>
+                    <div class="locked" style="height: 300px;"></div>
+                </div>
+            </div>
+
+            </main>
+    </div>
     <script src="app.js"></script>
 </body>
 </html>
