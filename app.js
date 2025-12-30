@@ -160,14 +160,25 @@ function renderizarTabela(links) {
 
 async function deletarLink(slug) {
     const token = localStorage.getItem('meupix_token');
-    if (!confirm("Tem certeza que deseja excluir?")) return;
+    if (!token) return alert("Sessão expirada!");
+    if (!confirm(`Deseja excluir o link /${slug}?`)) return;
 
-    const res = await fetch(`${API_URL}/api/links?slug=${slug}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': token }
-    });
+    try {
+        const res = await fetch(`${API_URL}/api/links?slug=${slug}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': token }
+        });
 
-    if (res.ok) carregarMeusLinks();
+        if (res.ok) {
+            alert("Link removido!");
+            carregarMeusLinks(); // Recarrega a tabela
+        } else {
+            const err = await res.json();
+            alert(err.error || "Erro ao excluir");
+        }
+    } catch (err) {
+        alert("Erro de conexão ao excluir.");
+    }
 }
 
 // --- 5. ELEMENTOS GLOBAIS ---
