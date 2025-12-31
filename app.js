@@ -1,3 +1,4 @@
+// PixPlus.pro - Script Principal (Edição Temas PRO 🚀)
 const API_URL = "https://meupix-api.moneynanet-yt.workers.dev";
 
 // --- 1. ESTADO GLOBAL E CONFIGURAÇÕES ---
@@ -27,6 +28,7 @@ function verificarSessao() {
 
 function logout() {
     localStorage.removeItem('meupix_token');
+    localStorage.removeItem('meupix_user_name');
     window.location.href = '/login.html';
 }
 
@@ -47,8 +49,6 @@ async function carregarMeusLinks() {
         console.error("Erro ao carregar Banco de Dados:", err);
     }
 }
-
-// --- 3. GESTÃO DE LINKS (TABELA E PAGINAÇÃO) ---
 
 function renderizarTabela() {
     const lista = document.getElementById('linksBody');
@@ -82,12 +82,10 @@ function renderizarTabela() {
     renderizarPaginacao();
 }
 
-// Nova lógica de confirmação sem pop-up
 function confirmarExclusao(slug) {
     const tdAcoes = document.getElementById(`acoes-${slug}`);
     if (!tdAcoes) return;
 
-    // Transforma o botão em uma confirmação inline
     tdAcoes.innerHTML = `
         <div style="display:flex; gap:8px; align-items:center;">
             <span style="color:#ff4d4d; font-size:11px; font-weight:bold;">Apagar?</span>
@@ -110,7 +108,6 @@ async function executarExclusao(slug) {
         });
 
         if (res.ok) {
-            // Remove do array local e re-renderiza
             linksGlobais = linksGlobais.filter(l => l.slug !== slug);
             renderizarTabela();
         } else {
@@ -142,25 +139,28 @@ function renderizarPaginacao() {
 
 function mudarPagina(num) { paginaAtual = num; renderizarTabela(); }
 
-// --- 4. CRIAÇÃO DE LINKS COM VALIDAÇÃO ---
+// --- 4. CRIAÇÃO DE LINKS COM VALIDAÇÃO E TEMA ---
 
-// Bloqueia caracteres especiais enquanto o usuário digita
 document.addEventListener('input', (e) => {
     if (e.target.id === 'novoSlug' || e.target.id === 'slug') {
         let val = e.target.value;
-        val = val.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove acentos
-        val = val.replace(/[çÇ]/g, "c"); // Remove cedilha
-        val = val.replace(/[^a-zA-Z0-9-]/g, "-"); // Tudo que não for letra/número vira hífen
-        val = val.replace(/-+/g, "-"); // Evita múltiplos hífens
+        val = val.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        val = val.replace(/[çÇ]/g, "c");
+        val = val.replace(/[^a-zA-Z0-9-]/g, "-");
+        val = val.replace(/-+/g, "-");
         e.target.value = val.toLowerCase();
     }
 });
 
+// FUNÇÃO ÚNICA DE CRIAÇÃO (Unificada e turbinada)
 async function criar(pixManual = null, slugManual = null) {
-    const pix = pixManual || document.getElementById("pix")?.value;
-    const customSlug = slugManual || document.getElementById("slug")?.value;
+    const pix = pixManual || document.getElementById("pix")?.value || document.getElementById("novoPix")?.value;
+    const customSlug = slugManual || document.getElementById("slug")?.value || document.getElementById("novoSlug")?.value;
     const token = localStorage.getItem('meupix_token');
     const msgStatus = document.getElementById('msgStatus');
+    
+    // Captura o tema se estiver na dashboard, senão usa o padrão
+    const tema = document.querySelector('.tema-card.active')?.dataset.tema || 'theme-default';
     
     if (!pix) return alert("Chave PIX obrigatória!");
 
@@ -168,19 +168,19 @@ async function criar(pixManual = null, slugManual = null) {
         const res = await fetch(`${API_URL}/api/links`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": token || "" },
-            body: JSON.stringify({ pix, customSlug })
+            body: JSON.stringify({ pix, customSlug, tema }) // TEMA ENVIADO AQUI!
         });
 
         const data = await res.json();
 
         if (res.ok) {
             if (token) {
-                // Sucesso dentro do Modal
                 if (msgStatus) {
                     msgStatus.innerText = "✅ Link criado com sucesso!";
                     msgStatus.style.color = "#00c896";
                     setTimeout(() => {
-                        document.getElementById('modalNovoLink').style.display = 'none';
+                        const modal = document.getElementById('modalNovoLink');
+                        if(modal) modal.style.display = 'none';
                         msgStatus.innerText = "";
                         carregarMeusLinks();
                     }, 1500);
@@ -194,23 +194,7 @@ async function criar(pixManual = null, slugManual = null) {
                 msgStatus.style.color = "#ff4d4d";
             } else { alert(data.error); }
         }
-    } catch (err) { alert("Erro de conexão."); }
-}
-
-async function criarNovoLink() {
-    const pix = document.getElementById('novoPix').value;
-    const slug = document.getElementById('novoSlug').value;
-    const tema = document.querySelector('.tema-selecionado')?.dataset.tema || 'theme-crypto';
-
-    const response = await fetch('https://sua-api.pixplus.pro/create', {
-        method: 'POST',
-        body: JSON.stringify({ pix, slug, tema })
-    });
-    await criar(pix, slug);
-    document.getElementById('novoPix').value = '';
-    document.getElementById('novoSlug').value = '';
-    
-    
+    } catch (err) { alert("Erro de conexão com o Banco de Dados."); }
 }
 
 // --- 5. AUXILIARES ---
@@ -224,16 +208,6 @@ function exibirResultadoHome(slug) {
         linkElem.innerText = `${host}/${slug}`;
         linkElem.href = `https://${host}/${slug}`;
     }
-}
-
-async function deletarLink(slug) {
-    const token = localStorage.getItem('meupix_token');
-    if (!confirm(`Deseja excluir /${slug}?`)) return;
-    await fetch(`${API_URL}/api/links?slug=${slug}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': token }
-    });
-    carregarMeusLinks();
 }
 
 function copiarLink() {
@@ -250,19 +224,17 @@ window.addEventListener('DOMContentLoaded', () => {
     injetarFavicon();
     if (window.location.pathname.includes('dashboard')) {
         carregarMeusLinks();
+        carregarBoasVindas();
     }
+    atualizarMenuIndex();
 });
 
 function trocarAba(aba) {
-    // 1. Esconde todas as abas
     document.querySelectorAll('.aba-conteudo').forEach(div => div.style.display = 'none');
-    
-    // 2. Remove o 'active' de todos os itens do menu
     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-
-    // 3. Mostra a aba clicada e ativa o menu
     document.getElementById(`view-${aba}`).style.display = 'block';
-    document.getElementById(`nav-${aba}`).classList.add('active');
+    const navItem = document.getElementById(`nav-${aba}`);
+    if(navItem) navItem.classList.add('active');
 }
 
 // --- LOGIN ---
@@ -272,7 +244,7 @@ async function logar() {
 
     try {
         const res = await fetch(`${API_URL}/api/login`, {
-            method: 'POST', // POST é obrigatório para segurança!
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, senha })
         });
@@ -281,7 +253,7 @@ async function logar() {
 
         if (res.ok) {
             localStorage.setItem('meupix_token', data.token);
-            localStorage.setItem('meupix_user_name', data.nome); // Salvamos o nome vindo do Banco de Dados
+            localStorage.setItem('meupix_user_name', data.nome);
             window.location.href = '/dashboard.html';
         } else {
             alert(data.error || "E-mail ou senha incorretos.");
@@ -298,14 +270,8 @@ async function cadastrar() {
     const senha = document.getElementById('password').value;
     const confirma = document.getElementById('confirmPassword').value;
 
-    // Validação básica antes de gastar internet kkk
-    if (senha !== confirma) {
-        return alert("As senhas não conferem, Pejotta! Dá uma conferida aí. 😉");
-    }
-
-    if (senha.length < 6) {
-        return alert("A senha precisa de pelo menos 6 caracteres.");
-    }
+    if (senha !== confirma) return alert("As senhas não conferem!");
+    if (senha.length < 6) return alert("A senha precisa de pelo menos 6 caracteres.");
 
     try {
         const res = await fetch(`${API_URL}/api/cadastro`, {
@@ -314,66 +280,47 @@ async function cadastrar() {
             body: JSON.stringify({ nome, email, senha })
         });
 
-        const data = await res.json();
-
         if (res.ok) {
-            alert("Sucesso! Conta criada. Agora é só logar e faturar!");
+            alert("Sucesso! Conta criada.");
             window.location.href = '/login.html';
         } else {
+            const data = await res.json();
             alert(data.error || "Houve um erro ao cadastrar.");
         }
     } catch (err) {
-        alert("Erro ao conectar com o servidor. O Banco de Dados está online?");
+        alert("Erro de conexão.");
     }
 }
 
-// --- BOAS-VINDAS DINÂMICO ---
 function carregarBoasVindas() {
     const nome = localStorage.getItem('meupix_user_name') || "Usuário";
     const saudacaoElem = document.querySelector('#view-home h1');
     if (saudacaoElem) {
-        saudacaoElem.innerText = `Bem-vindo, ${nome.split(' ')[0]}!`; // Pega só o primeiro nome
+        saudacaoElem.innerText = `Bem-vindo, ${nome.split(' ')[0]}!`;
     }
 }
 
-// Atualize o listener inicial para carregar o nome
-window.addEventListener('DOMContentLoaded', () => {
-    injetarFavicon();
-    if (window.location.pathname.includes('dashboard')) {
-        carregarMeusLinks();
-        carregarBoasVindas();
-    }
-});
-// Listener Global para o Menu Sanduíche
-document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.menu-toggle-btn');
-    const overlay = document.querySelector('.menu-overlay');
-    const sidebar = document.querySelector('.sidebar');
-
-    if (btn || e.target.classList.contains('menu-overlay')) {
-        sidebar?.classList.toggle('active');
-        overlay?.classList.toggle('active');
-    }
-});
-
-// Função para atualizar o menu da Index conforme o status de login
 function atualizarMenuIndex() {
     const token = localStorage.getItem('meupix_token');
     const headerActions = document.getElementById('header-actions');
-
     if (token && headerActions) {
-        // Se existir um token, o usuário está logado!
         const nomeUsuario = localStorage.getItem('meupix_user_name') || 'Usuário';
-        const primeiroNome = nomeUsuario.split(' ')[0];
-
         headerActions.innerHTML = `
             <div style="display: flex; align-items: center; gap: 15px;">
-                <span style="color: #888; font-size: 14px; display: none; @media (min-width: 768px) { display: inline; }">Olá, ${primeiroNome}!</span>
-                <a href="/dashboard.html" class="btn-login" style="background: var(--primary); color: #000;">Acessar Painel</a>
+                <span style="color: #888; font-size: 14px;">Olá, ${nomeUsuario.split(' ')[0]}!</span>
+                <a href="/dashboard.html" class="btn-login" style="background: var(--primary); color: #000; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-weight: bold;">Painel</a>
             </div>
         `;
     }
 }
 
-// Executa a função assim que a página carrega
-document.addEventListener('DOMContentLoaded', atualizarMenuIndex);
+// Menu Mobile
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.menu-toggle-btn');
+    const overlay = document.querySelector('.menu-overlay');
+    const sidebar = document.querySelector('.sidebar');
+    if (btn || e.target.classList.contains('menu-overlay')) {
+        sidebar?.classList.toggle('active');
+        overlay?.classList.toggle('active');
+    }
+});
