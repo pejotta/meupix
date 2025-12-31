@@ -231,3 +231,51 @@ footer { padding: 50px 5%; border-top: 1px solid #222; text-align: center; }
         padding-top: 70px !important;
     }
 }
+/* --- TEMAS DE FUNDO (PÁGINA DE DESTINO) --- */
+
+/* Base da página de destino */
+.slug-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* 1. Campos de Trigo (Vibe Clean/Paz) */
+.theme-wheat {
+    background-image: url('https://images.unsplash.com/photo-1444852538915-ac95232916dd?q=80&w=1920');
+}
+.theme-wheat .pix-card { background: rgba(255, 255, 255, 0.9); color: #333; backdrop-filter: blur(5px); }
+
+/* 2. Universo (Vibe Infinita) */
+.theme-universe {
+    background-image: url('https://images.unsplash.com/photo-1464802686167-b939a67e06a1?q=80&w=1920');
+}
+.theme-universe .pix-card { background: rgba(255, 255, 255, 0.85); color: #000; }
+
+/* 3. Céu (Vibe Leve) */
+.theme-sky {
+    background-image: url('https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?q=80&w=1920');
+}
+.theme-sky .pix-card { background: rgba(255, 255, 255, 0.9); border: 1px solid #ddd; }
+
+/* 4. Blockchain/Digital (Vibe Tech - Dark) */
+.theme-crypto {
+    background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=1920');
+}
+.theme-crypto .pix-card { background: rgba(20, 20, 20, 0.9); color: var(--primary); border: 1px solid var(--primary); }
+
+/* 5. Midnight City (Vibe Urbana/Noturna) */
+.theme-city {
+    background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1477346611705-65d1883cee1e?q=80&w=1920');
+}
+.theme-city .pix-card { background: rgba(15, 15, 15, 0.95); border-left: 5px solid var(--primary); }
+
+/* 6. Anime (Vibe Estética/Lofi) */
+.theme-anime {
+    background-image: url('https://images.unsplash.com/photo-1578632292335-df3abbb0d586?q=80&w=1920');
+}
+.theme-anime .pix-card { background: rgba(30, 0, 50, 0.8); color: #ff79c6; border: 2px dashed #ff79c6; }
