@@ -54,6 +54,10 @@ function renderizarTabela() {
     const totalClicksElem = document.getElementById('totalClicks');
     if (!lista) return;
 
+    // Captura o plano atual para saber se mostra o botão de editar
+    const plano = (localStorage.getItem('meupix_user_plan') || 'free').toLowerCase();
+
+    // Atualiza o contador de cliques total no topo
     if (totalClicksElem) {
         const total = linksGlobais.reduce((acc, curr) => acc + (parseInt(curr.clicks) || 0), 0);
         totalClicksElem.innerText = total;
@@ -67,18 +71,34 @@ function renderizarTabela() {
     const inicio = (paginaAtual - 1) * linksPorPagina;
     const linksPaginados = linksGlobais.slice(inicio, inicio + linksPorPagina);
 
-    lista.innerHTML = linksPaginados.map(l => `
-        <tr>
-            <td><a href="/${l.slug}" target="_blank" style="color:#00c896; font-weight:bold;">/${l.slug}</a></td>
-            <td style="font-family: monospace; font-size: 13px; color: #ccc;">${l.pix}</td>
-            <td>📊 ${l.clicks || 0}</td>
-            <td id="acoes-${l.slug}">
-                <button onclick="confirmarExclusao('${l.slug}')" class="btn-del">Excluir</button>
-            </td>
-        </tr>
-    `).join('');
+    lista.innerHTML = linksPaginados.map(l => {
+        // Verifica se o usuário tem direito ao botão de editar (Slug)
+        const podeEditar = ['ouro', 'diamante', 'admin'].includes(plano);
 
-    renderizarPaginacao();
+        return `
+            <tr>
+                <td>
+                    <a href="/${l.slug}" target="_blank" style="color:#00c896; font-weight:bold; text-decoration:none;">/${l.slug}</a>
+                </td>
+                <td style="font-family: monospace; font-size: 13px; color: #ccc;">${l.pix}</td>
+                <td>📊 ${l.clicks || 0}</td>
+                <td>
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="copiarLink('${l.slug}')" title="Copiar Link" style="background:#222; border:none; cursor:pointer; padding:5px; border-radius:5px;">🔗</button>
+                        
+                        ${podeEditar ? 
+                            `<button onclick="abrirModalEdicao('${l.slug}')" title="Editar Slug" style="background:#222; border:none; cursor:pointer; padding:5px; border-radius:5px;">✏️</button>` 
+                            : ''
+                        }
+                        
+                        <button onclick="confirmarExclusao('${l.slug}')" class="btn-del" title="Excluir" style="background:none; border:none; cursor:pointer; font-weight:bold;">🗑️</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    if (typeof renderizarPaginacao === "function") renderizarPaginacao();
 }
 
 function confirmarExclusao(slug) {
