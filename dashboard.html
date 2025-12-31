@@ -175,14 +175,33 @@
             </div>
 
             <div id="view-analytics" class="aba-conteudo" style="display:none">
-                <h2>📊 Analytics Detalhado</h2>
-                <div class="stat-card" style="text-align: center; padding: 100px 20px;">
-                    <span style="font-size: 50px;">🔒</span>
-                    <h3>Recurso Exclusivo PRO</h3>
-                    <p style="color:#888;">Acompanhe de onde vêm seus pagamentos em tempo real.</p>
-                    <button onclick="trocarAba('planos')" class="btn-upgrade" style="margin-top:20px; padding: 10px 30px;">Ver Planos</button>
-                </div>
-            </div>
+    <header class="dash-header">
+        <div>
+            <h1 style="margin:0">Analytics Detalhado</h1>
+            <p style="color:#888">Desempenho dos seus links no Banco de Dados.</p>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Visualizações Únicas</h3>
+            <span class="value" id="uniqueViews">--</span>
+        </div>
+        <div class="stat-card">
+            <h3>Taxa de Conversão</h3>
+            <span class="value" id="convRate">--</span>
+        </div>
+    </div>
+
+    <div class="links-section" style="margin-top: 20px; min-height: 300px; display: flex; align-items: center; justify-content: center; background: var(--card);">
+        <div id="analytics-placeholder" style="text-align: center; width: 100%;">
+            <span style="font-size: 50px;">🔒</span>
+             <h3>Recurso Exclusivo PRO</h3>
+             <p style="color:#888;">Acompanhe o tráfego diário e origem dos cliques.</p>
+             <button onclick="trocarAba('planos')" class="btn-upgrade" style="margin-top:20px; padding: 10px 30px;">Ver Planos</button>
+        </div>
+    </div>
+</div>
 
             <div id="view-modelos" class="aba-conteudo" style="display:none">
                 <header class="dash-header">
