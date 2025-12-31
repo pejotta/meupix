@@ -172,12 +172,7 @@ async function criar() {
         const res = await fetch(`${API_URL}/api/links`, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": token },
-            body: JSON.stringify({ 
-                pix, 
-                customSlug, 
-                tema, 
-                descricao 
-            })
+            body: JSON.stringify({ pix, customSlug, tema, descricao })
         });
 
         const data = await res.json();
@@ -186,7 +181,6 @@ async function criar() {
             msgStatus.innerText = "✅ Link criado com sucesso!";
             msgStatus.style.color = "#00c896";
             
-            // Limpa os campos
             document.getElementById("novoPix").value = "";
             document.getElementById("novoSlug").value = "";
             document.getElementById("novaDescricao").value = "";
@@ -194,11 +188,14 @@ async function criar() {
             setTimeout(() => {
                 document.getElementById('modalNovoLink').style.display = 'none';
                 msgStatus.innerText = "";
-                carregarMeusLinks(); // Recarrega a tabela para mostrar o novo link
+                carregarMeusLinks(); 
             }, 1500);
         } else {
+            // AQUI ESTÁ A MÁGICA: Pega o erro do Worker (com o nome do usuário)
             msgStatus.innerText = "❌ " + (data.error || "Erro ao criar");
             msgStatus.style.color = "#ff4d4d";
+            
+            // Opcional: Se for erro de limite, você pode até mudar a cor do botão para incentivar o upgrade
         }
     } catch (err) { 
         console.error(err);
