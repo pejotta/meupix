@@ -96,7 +96,7 @@
         .tema-card.active img { opacity: 1; }
         .tema-card p { padding: 12px; margin: 0; text-align: center; font-weight: bold; font-size: 14px; color: #ccc; }
         .tema-card.active p { color: var(--primary); }
-        .badge-pro-tag { position: absolute; top: 10px; right: 10px; background: var(--primary); color: #000; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: bold; z-index: 10; }
+        .badge-pro-tag { position: absolute; background: var(--primary); color: #000; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: bold; z-index: 10; }
 
         /* --- MODAL CORRIGIDO --- */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
@@ -211,48 +211,48 @@
                 </header>
                 <div class="temas-grid">
                     <div class="tema-card active" data-tema="theme-default">
-                        <div style="width:100%; height:120px; background:#0b0b0b; display:flex; align-items:center; justify-content:center; color:#333;">PADRÃO</div>
-                        <p>Dark Minimalista</p>
+                        <span class="badge-pro-tag">PADRÃO</span>
+                        <img src="/assets/modelos/preview-padrao.webp" alt="Padrão" onclick="abrirLightbox(this)"><p>Padrão Minimalista/p>
                     </div>
                     <div class="tema-card" data-tema="theme-wheat">
-                        <span class="badge-pro-tag">PRO</span>
-                        <img src="/assets/modelos/modelo-trigo.webp" alt="Trigo" onclick="abrirLightbox(this)"><p>Campos de Trigo</p>
+                        <span class="badge-pro-tag">BRONZE</span>
+                        <img src="/assets/modelos/preview-trigo.webp" alt="Trigo" onclick="abrirLightbox(this)"><p>Campos de Trigo</p>
                     </div>
                     <div class="tema-card" data-tema="theme-festa">
-                        <span class="badge-pro-tag">PRO</span>
-                        <img src="/assets/modelos/festa.webp" alt="Festa" onclick="abrirLightbox(this)"><p>Festa</p>
+                        <span class="badge-pro-tag">BRONZE</span>
+                        <img src="/assets/modelos/preview-festa.webp" alt="Festa" onclick="abrirLightbox(this)"><p>Festa</p>
                     </div>
                     <div class="tema-card" data-tema="theme-futebol">
-                        <span class="badge-pro-tag">PRO</span>
-                        <img src="/assets/modelos/futebol.webp" alt="Futebol" onclick="abrirLightbox(this)"><p>Futebol</p>
+                        <span class="badge-pro-tag">PRATA</span>
+                        <img src="/assets/modelos/preview-futebol.webp" alt="Futebol" onclick="abrirLightbox(this)"><p>Futebol</p>
                     </div>
                     <div class="tema-card" data-tema="theme-liberdade">
-                        <span class="badge-pro-tag">PRO</span>
-                        <img src="/assets/modelos/liberdade.webp" alt="Liberdade" onclick="abrirLightbox(this)"><p>Liberdade</p>
+                        <span class="badge-pro-tag">PRATA</span>
+                        <img src="/assets/modelos/preview-liberdade.webp" alt="Liberdade" onclick="abrirLightbox(this)"><p>Liberdade</p>
                     </div>
                     <div class="tema-card" data-tema="theme-caridade">
-                        <span class="badge-pro-tag">PRO</span>
-                        <img src="/assets/modelos/caridade.webp" alt="Caridade" onclick="abrirLightbox(this)"><p>Caridade</p>
+                        <span class="badge-pro-tag">PRATA</span>
+                        <img src="/assets/modelos/preview-caridade.webp" alt="Caridade" onclick="abrirLightbox(this)"><p>Caridade</p>
                     </div>
                     <div class="tema-card" data-tema="theme-universe">
-                        <span class="badge-pro-tag">PRO</span>
-                        <img src="/assets/modelos/modelo-universo.webp" alt="Universo" onclick="abrirLightbox(this)"><p>Espaço Sideral</p>
+                        <span class="badge-pro-tag">OURO</span>
+                        <img src="/assets/modelos/preview-universo.webp" alt="Universo" onclick="abrirLightbox(this)"><p>Espaço Sideral</p>
                     </div>
                     <div class="tema-card" data-tema="theme-sky">
-                        <span class="badge-pro-tag">PRO</span>
-                        <img src="/assets/modelos/modelo-ceu.webp" alt="Céu" onclick="abrirLightbox(this)"><p>Céu Limpo</p>
+                        <span class="badge-pro-tag">OURO</span>
+                        <img src="/assets/modelos/preview-ceu.webp" alt="Céu" onclick="abrirLightbox(this)"><p>Céu Limpo</p>
                     </div>
                     <div class="tema-card" data-tema="theme-crypto">
-                        <span class="badge-pro-tag">PRO</span>
-                        <img src="/assets/modelos/modelo-blockchain.webp" alt="Crypto" onclick="abrirLightbox(this)"><p>Blockchain Digital</p>
+                        <span class="badge-pro-tag">OURO</span>
+                        <img src="/assets/modelos/preview-crypto.webp" alt="Crypto" onclick="abrirLightbox(this)"><p>Blockchain Digital</p>
                     </div>
                     <div class="tema-card" data-tema="theme-city">
-                        <span class="badge-pro-tag">PRO</span>
-                        <img src="/assets/modelos/modelo-midnight-city.webp" alt="City" onclick="abrirLightbox(this)"><p>Midnight City</p>
+                        <span class="badge-pro-tag">DIAMANTE</span>
+                        <img src="/assets/modelos/preview-city.webp" alt="City" onclick="abrirLightbox(this)"><p>Midnight City</p>
                     </div>
                     <div class="tema-card" data-tema="theme-anime">
-                        <span class="badge-pro-tag">PRO</span>
-                        <img src="/assets/modelos/modelo-anime.webp" alt="Anime" onclick="abrirLightbox(this)"><p>Estética Anime</p>
+                        <span class="badge-pro-tag">DIAMANTE</span>
+                        <img src="/assets/modelos/preview-anime.webp" alt="Anime" onclick="abrirLightbox(this)"><p>Estética Anime</p>
                     </div>
                 </div>
             </div>
