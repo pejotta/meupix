@@ -242,7 +242,7 @@ async function logar() {
         });
         const data = await res.json();
         if (res.ok) {
-            localStorage.setItem('meupix_user_plan', data.plan);
+            localStorage.setItem('meupix_user_plan', , 'diamante');
             localStorage.setItem('meupix_token', data.token);
             localStorage.setItem('meupix_user_name', data.nome);
             window.location.href = '/dashboard.html';
