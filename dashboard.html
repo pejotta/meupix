@@ -261,9 +261,13 @@
     <script src="app.js"></script>
     <script>
         function selecionarTema(elemento) {
-            document.querySelectorAll('.tema-card').forEach(c => c.classList.remove('active'));
-            elemento.classList.add('active');
-        }
+    document.querySelectorAll('.tema-card').forEach(c => c.classList.remove('active'));
+    elemento.classList.add('active');
+    
+    // Atualiza o nome do tema no modal para o usuário saber o que está usando
+    const nomeTema = elemento.querySelector('p').innerText;
+    document.getElementById('nome-tema-selecionado').innerText = nomeTema;
+}
     </script>
 </body>
 </html>
