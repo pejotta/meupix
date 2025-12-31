@@ -1,4 +1,4 @@
-// PixPlus.pro - Script Principal (Edição Temas PRO 🚀)
+// PixPlus.pro - Script Principal (Edição Temas PRO & Descrição 🚀)
 const API_URL = "https://meupix-api.moneynanet-yt.workers.dev";
 
 // --- 1. ESTADO GLOBAL E CONFIGURAÇÕES ---
@@ -126,7 +126,8 @@ function renderizarPaginacao() {
         pagContainer = document.createElement('div');
         pagContainer.id = 'paginacao';
         pagContainer.style.cssText = "display:flex; justify-content:center; gap:10px; margin-top:20px;";
-        document.querySelector('.links-section').appendChild(pagContainer);
+        const linksSection = document.querySelector('.links-section');
+        if (linksSection) linksSection.appendChild(pagContainer);
     }
     const totalPaginas = Math.ceil(linksGlobais.length / linksPorPagina);
     let html = '';
@@ -152,29 +153,30 @@ document.addEventListener('input', (e) => {
     }
 });
 
-// FUNÇÃO ÚNICA DE CRIAÇÃO (Unificada e turbinada)
-async function criar(pixManual = null, slugManual = null) {
-    const pix = pixManual || document.getElementById("novoPix")?.value;
-    const customSlug = slugManual || document.getElementById("novoSlug")?.value;
-    const token = localStorage.getItem('meupix_token');
+// FUNÇÃO ÚNICA DE CRIAÇÃO (Corrigida e Unificada)
+async function criar() {
+    const pix = document.getElementById("novoPix").value;
+    const customSlug = document.getElementById("novoSlug").value;
+    const tema = document.getElementById("temaSelect").value;
+    const descricao = document.getElementById("novaDescricao").value;
     const msgStatus = document.getElementById('msgStatus');
-    
-    // A MÁGICA ESTÁ AQUI: Captura o tema que está ATIVO na aba de modelos no momento da criação
-    const temaSelecionado = document.querySelector('.tema-card.active')?.dataset.tema || 'theme-default';
-    
-    if (!pix) return alert("Chave PIX obrigatória!");
+    const token = localStorage.getItem('meupix_token');
+
+    if (!pix) {
+        msgStatus.innerText = "❌ Informe sua chave PIX!";
+        msgStatus.style.color = "#ff4d4d";
+        return;
+    }
 
     try {
         const res = await fetch(`${API_URL}/api/links`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json", 
-                "Authorization": token || "" 
-            },
+            headers: { "Content-Type": "application/json", "Authorization": token },
             body: JSON.stringify({ 
                 pix, 
                 customSlug, 
-                tema: temaSelecionado // Salva o tema específico para este link!
+                tema, 
+                descricao 
             })
         });
 
@@ -183,43 +185,34 @@ async function criar(pixManual = null, slugManual = null) {
         if (res.ok) {
             msgStatus.innerText = "✅ Link criado com sucesso!";
             msgStatus.style.color = "#00c896";
+            
+            // Limpa os campos
+            document.getElementById("novoPix").value = "";
+            document.getElementById("novoSlug").value = "";
+            document.getElementById("novaDescricao").value = "";
+            
             setTimeout(() => {
                 document.getElementById('modalNovoLink').style.display = 'none';
                 msgStatus.innerText = "";
-                carregarMeusLinks(); // Recarrega a tabela
+                carregarMeusLinks(); // Recarrega a tabela para mostrar o novo link
             }, 1500);
         } else {
             msgStatus.innerText = "❌ " + (data.error || "Erro ao criar");
             msgStatus.style.color = "#ff4d4d";
         }
     } catch (err) { 
+        console.error(err);
         alert("Erro ao conectar com o Banco de Dados."); 
     }
 }
 
-// --- 5. AUXILIARES ---
+// --- 5. AUXILIARES E INICIALIZAÇÃO ---
 
-function exibirResultadoHome(slug) {
-    const container = document.getElementById("container-resultado");
-    const linkElem = document.getElementById("link-gerado");
-    if (container && linkElem) {
-        container.style.display = "block";
-        const host = window.location.host; 
-        linkElem.innerText = `${host}/${slug}`;
-        linkElem.href = `https://${host}/${slug}`;
-    }
+function fecharModal() {
+    const modal = document.getElementById('modalNovoLink');
+    if (modal) modal.style.display = 'none';
 }
 
-function copiarLink() {
-    const link = document.getElementById('link-gerado').innerText;
-    navigator.clipboard.writeText(link).then(() => {
-        const btn = document.querySelector("#container-resultado button");
-        btn.innerText = "Copiado!";
-        setTimeout(() => btn.innerText = "Copiar", 2000);
-    });
-}
-
-// Inicialização Única
 window.addEventListener('DOMContentLoaded', () => {
     injetarFavicon();
     if (window.location.pathname.includes('dashboard')) {
@@ -232,12 +225,14 @@ window.addEventListener('DOMContentLoaded', () => {
 function trocarAba(aba) {
     document.querySelectorAll('.aba-conteudo').forEach(div => div.style.display = 'none');
     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-    document.getElementById(`view-${aba}`).style.display = 'block';
+    
+    const view = document.getElementById(`view-${aba}`);
+    if (view) view.style.display = 'block';
+    
     const navItem = document.getElementById(`nav-${aba}`);
-    if(navItem) navItem.classList.add('active');
+    if (navItem) navItem.classList.add('active');
 }
 
-// --- LOGIN ---
 async function logar() {
     const email = document.getElementById('email').value;
     const senha = document.getElementById('password').value;
@@ -248,9 +243,7 @@ async function logar() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, senha })
         });
-
         const data = await res.json();
-
         if (res.ok) {
             localStorage.setItem('meupix_token', data.token);
             localStorage.setItem('meupix_user_name', data.nome);
@@ -263,7 +256,6 @@ async function logar() {
     }
 }
 
-// --- CADASTRO ---
 async function cadastrar() {
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
@@ -279,7 +271,6 @@ async function cadastrar() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome, email, senha })
         });
-
         if (res.ok) {
             alert("Sucesso! Conta criada.");
             window.location.href = '/login.html';
@@ -314,7 +305,6 @@ function atualizarMenuIndex() {
     }
 }
 
-// Menu Mobile
 document.addEventListener('click', (e) => {
     const btn = e.target.closest('.menu-toggle-btn');
     const overlay = document.querySelector('.menu-overlay');
