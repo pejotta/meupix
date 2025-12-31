@@ -242,6 +242,7 @@ async function logar() {
         });
         const data = await res.json();
         if (res.ok) {
+            localStorage.setItem('meupix_user_plan', data.plan);
             localStorage.setItem('meupix_token', data.token);
             localStorage.setItem('meupix_user_name', data.nome);
             window.location.href = '/dashboard.html';
@@ -282,9 +283,19 @@ async function cadastrar() {
 
 function carregarBoasVindas() {
     const nome = localStorage.getItem('meupix_user_name') || "Usuário";
+    const plano = localStorage.getItem('meupix_user_plan') || "Free"; // Pegando do login
+    
     const saudacaoElem = document.querySelector('#view-home h1');
+    const badgePlano = document.querySelector('.badge-free'); // Seleciona a badge
+    
     if (saudacaoElem) {
         saudacaoElem.innerText = `Bem-vindo, ${nome.split(' ')[0]}!`;
+    }
+    
+    if (badgePlano) {
+        badgePlano.innerText = `Plano ${plano.charAt(0).toUpperCase() + plano.slice(1)}`;
+        // Se quiser mudar a cor conforme o plano:
+        if(plano !== 'free') badgePlano.style.color = 'var(--primary)';
     }
 }
 
