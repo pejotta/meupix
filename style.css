@@ -122,7 +122,7 @@ header {
     border-radius: 20px;
     border: 1px solid #222;
     position: relative;
-    font-size: smaller;
+    font-size: 0.9em;
 }
 
 .price-card.featured { border-color: var(--primary); transform: scale(1.05); }
