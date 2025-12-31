@@ -200,9 +200,17 @@ async function criar(pixManual = null, slugManual = null) {
 async function criarNovoLink() {
     const pix = document.getElementById('novoPix').value;
     const slug = document.getElementById('novoSlug').value;
+    const tema = document.querySelector('.tema-selecionado')?.dataset.tema || 'theme-crypto';
+
+    const response = await fetch('https://sua-api.pixplus.pro/create', {
+        method: 'POST',
+        body: JSON.stringify({ pix, slug, tema })
+    });
     await criar(pix, slug);
     document.getElementById('novoPix').value = '';
     document.getElementById('novoSlug').value = '';
+    
+    
 }
 
 // --- 5. AUXILIARES ---
