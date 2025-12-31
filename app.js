@@ -208,23 +208,36 @@ function trocarAba(aba) {
     if (aba === 'planos') gerenciarBotoesPlanos();
 }
 
+// --- ATUALIZAÇÃO DA LOGICA DE INTERFACE ---
+
 function carregarBoasVindas() {
     const nome = localStorage.getItem('meupix_user_name') || "Usuário";
-    const plano = localStorage.getItem('meupix_user_plan') || "free";
+    // Pegando 'plan' (como está no seu KV)
+    const plano = (localStorage.getItem('meupix_user_plan') || "free").toLowerCase();
     
     const saudacaoElem = document.querySelector('#view-home h1');
     const badgePlano = document.querySelector('.badge-plan'); 
     
     if (saudacaoElem) saudacaoElem.innerText = `Bem-vindo, ${nome.split(' ')[0]}!`;
+    
     if (badgePlano) {
         badgePlano.innerText = `Plano ${plano.toUpperCase()}`;
-        badgePlano.style.color = plano === 'free' ? '#888' : 'var(--primary)';
+        // Se for diamante ou admin, brilha o verde!
+        badgePlano.style.color = (plano === 'free') ? '#888' : 'var(--primary)';
     }
 
-    // Se o usuário acabou de logar e o plano é Diamante (exemplo), mostra o alerta
-    if (plano === 'diamante' && !sessionStorage.getItem('avisoUpgrade')) {
-        mostrarAlertaUpgrade('DIAMANTE');
-        sessionStorage.setItem('avisoUpgrade', 'true'); // Mostra só uma vez por sessão
+    // --- LIBERAR ANALYTICS SE FOR PLANO ALTO ---
+    const planosPro = ['ouro', 'diamante', 'admin'];
+    if (planosPro.includes(plano)) {
+        // Remove os borrões e os cadeados
+        document.querySelectorAll('.locked').forEach(el => el.classList.remove('locked'));
+        document.querySelectorAll('.lock-overlay').forEach(el => el.style.display = 'none');
+        
+        // Se estiver na aba analytics, podemos até injetar um aviso de "Modo PRO Ativo"
+        const areaAnalytics = document.querySelector('#view-analytics .stat-card');
+        if (areaAnalytics && areaAnalytics.innerHTML.includes('🔒')) {
+            areaAnalytics.innerHTML = `<h3>📊 Gráficos de Performance</h3><p>Seus dados estão sendo processados em tempo real.</p>`;
+        }
     }
 }
 
@@ -233,12 +246,28 @@ function gerenciarBotoesPlanos() {
     const cards = document.querySelectorAll('.plano-card');
 
     cards.forEach(card => {
-        const nomePlanoCard = card.querySelector('h3').innerText.toLowerCase();
-        const btn = card.querySelector('.btn-upgrade');
-        if (nomePlanoCard === planoAtual) {
+        const h3 = card.querySelector('h3');
+        if (!h3) return;
+        
+        const nomePlanoCard = h3.innerText.toLowerCase();
+        const btn = card.querySelector('.btn-upgrade, button');
+
+        // Resetar todos os botões primeiro para o estado padrão
+        if (btn && nomePlanoCard !== planoAtual) {
+             // Se não for o plano atual e for o grátis, ele não deve ter link, mas os outros sim
+             if (nomePlanoCard !== 'grátis' && nomePlanoCard !== 'free') {
+                 // Deixa o botão de assinar habilitado
+                 btn.style.cssText = ""; 
+                 btn.removeAttribute('disabled');
+             }
+        }
+
+        // Marcar o plano ativo
+        if (nomePlanoCard === planoAtual || (planoAtual === 'free' && nomePlanoCard === 'grátis')) {
             if (btn) {
                 btn.innerText = "Plano Ativo";
-                btn.style.cssText = "background:#333; color:#888; pointer-events:none; cursor:default;";
+                btn.style.cssText = "background:#333 !important; color:#888 !important; pointer-events:none; cursor:default;";
+                btn.setAttribute('disabled', 'true');
                 card.style.borderColor = "var(--primary)";
             }
         }
