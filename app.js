@@ -299,6 +299,40 @@ function carregarBoasVindas() {
     }
 }
 
+function gerenciarBotoesPlanos() {
+    // Pega o plano do usuário (ex: 'free', 'bronze', 'prata'...)
+    const planoAtual = (localStorage.getItem('meupix_user_plan') || 'free').toLowerCase();
+
+    // Mapeia os cards de planos na dashboard
+    const cards = document.querySelectorAll('.plano-card');
+
+    cards.forEach(card => {
+        // Pega o nome do plano dentro do h3 do card
+        const nomePlanoCard = card.querySelector('h3').innerText.toLowerCase();
+        const btn = card.querySelector('.btn-upgrade');
+
+        if (nomePlanoCard === planoAtual) {
+            if (btn) {
+                btn.innerText = "Plano Ativo";
+                btn.style.background = "#333";
+                btn.style.color = "#888";
+                btn.style.cursor = "default";
+                btn.style.pointerEvents = "none"; // Desativa o link
+                card.style.borderColor = "var(--primary)"; // Destaca o card atual
+            }
+        }
+    });
+}
+
+// Chame essa função dentro da sua função trocarAba()
+function trocarAba(aba) {
+    // ... sua lógica de esconder/mostrar abas ...
+    
+    if (aba === 'planos') {
+        gerenciarBotoesPlanos();
+    }
+}
+
 function atualizarMenuIndex() {
     const token = localStorage.getItem('meupix_token');
     const headerActions = document.getElementById('header-actions');
