@@ -154,47 +154,47 @@ document.addEventListener('input', (e) => {
 
 // FUNÇÃO ÚNICA DE CRIAÇÃO (Unificada e turbinada)
 async function criar(pixManual = null, slugManual = null) {
-    const pix = pixManual || document.getElementById("pix")?.value || document.getElementById("novoPix")?.value;
-    const customSlug = slugManual || document.getElementById("slug")?.value || document.getElementById("novoSlug")?.value;
+    const pix = pixManual || document.getElementById("novoPix")?.value;
+    const customSlug = slugManual || document.getElementById("novoSlug")?.value;
     const token = localStorage.getItem('meupix_token');
     const msgStatus = document.getElementById('msgStatus');
     
-    // Captura o tema se estiver na dashboard, senão usa o padrão
-    const tema = document.querySelector('.tema-card.active')?.dataset.tema || 'theme-default';
+    // A MÁGICA ESTÁ AQUI: Captura o tema que está ATIVO na aba de modelos no momento da criação
+    const temaSelecionado = document.querySelector('.tema-card.active')?.dataset.tema || 'theme-default';
     
     if (!pix) return alert("Chave PIX obrigatória!");
 
     try {
         const res = await fetch(`${API_URL}/api/links`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": token || "" },
-            body: JSON.stringify({ pix, customSlug, tema }) // TEMA ENVIADO AQUI!
+            headers: { 
+                "Content-Type": "application/json", 
+                "Authorization": token || "" 
+            },
+            body: JSON.stringify({ 
+                pix, 
+                customSlug, 
+                tema: temaSelecionado // Salva o tema específico para este link!
+            })
         });
 
         const data = await res.json();
 
         if (res.ok) {
-            if (token) {
-                if (msgStatus) {
-                    msgStatus.innerText = "✅ Link criado com sucesso!";
-                    msgStatus.style.color = "#00c896";
-                    setTimeout(() => {
-                        const modal = document.getElementById('modalNovoLink');
-                        if(modal) modal.style.display = 'none';
-                        msgStatus.innerText = "";
-                        carregarMeusLinks();
-                    }, 1500);
-                }
-            } else {
-                exibirResultadoHome(data.slug);
-            }
+            msgStatus.innerText = "✅ Link criado com sucesso!";
+            msgStatus.style.color = "#00c896";
+            setTimeout(() => {
+                document.getElementById('modalNovoLink').style.display = 'none';
+                msgStatus.innerText = "";
+                carregarMeusLinks(); // Recarrega a tabela
+            }, 1500);
         } else {
-            if (msgStatus) {
-                msgStatus.innerText = "❌ " + (data.error || "Erro ao criar");
-                msgStatus.style.color = "#ff4d4d";
-            } else { alert(data.error); }
+            msgStatus.innerText = "❌ " + (data.error || "Erro ao criar");
+            msgStatus.style.color = "#ff4d4d";
         }
-    } catch (err) { alert("Erro de conexão com o Banco de Dados."); }
+    } catch (err) { 
+        alert("Erro ao conectar com o Banco de Dados."); 
+    }
 }
 
 // --- 5. AUXILIARES ---
