@@ -232,27 +232,31 @@
     </div>
 
     <div id="modalNovoLink" class="modal">
-        <div class="modal-content">
-            <h2 style="margin:0 0 20px 0; color:var(--primary);">Criar Novo Link</h2>
-            
-            <div class="input-group">
-                <label>Sua Chave PIX</label>
-                <input type="text" id="novoPix" placeholder="E-mail, CPF ou Chave">
-            </div>
-            
-            <div class="input-group">
-                <label>Atalho Personalizado (Slug)</label>
-                <input type="text" id="novoSlug" placeholder="Ex: promo-natal">
-            </div>
-            
-            <p id="msgStatus" style="font-weight: bold; font-size: 14px; margin: 15px 0; min-height: 20px;"></p>
-            
-            <div class="modal-actions">
-                <button onclick="criar()" class="btn-modal-primary">Gerar Link</button>
-                <button onclick="document.getElementById('modalNovoLink').style.display='none'" class="btn-modal-secondary">Voltar</button>
-            </div>
+    <div class="modal-content">
+        <h2 style="margin:0 0 10px 0; color:var(--primary);">Criar Novo Link</h2>
+        <p style="font-size: 12px; color: #888; margin-bottom: 20px;">
+            O tema selecionado em "Modelos" será aplicado: <br>
+            <strong id="nome-tema-selecionado" style="color: var(--primary); text-transform: uppercase;">Padrão Dark</strong>
+        </p>
+        
+        <div class="input-group">
+            <label>Sua Chave PIX</label>
+            <input type="text" id="novoPix" placeholder="E-mail, CPF ou Chave">
+        </div>
+        
+        <div class="input-group">
+            <label>Atalho Personalizado (Slug)</label>
+            <input type="text" id="novoSlug" placeholder="Ex: pix-da-igreja">
+        </div>
+        
+        <p id="msgStatus" style="font-weight: bold; font-size: 14px; margin: 15px 0; min-height: 20px;"></p>
+        
+        <div class="modal-actions">
+            <button onclick="criar()" class="btn-modal-primary">Gerar Link com este Tema</button>
+            <button onclick="document.getElementById('modalNovoLink').style.display='none'" class="btn-modal-secondary">Voltar</button>
         </div>
     </div>
+</div>
 
     <script src="app.js"></script>
     <script>
