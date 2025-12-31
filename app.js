@@ -212,7 +212,7 @@ function trocarAba(aba) {
 
 function carregarBoasVindas() {
     const nome = localStorage.getItem('meupix_user_name') || "Usuário";
-    // Pegando 'plan' (como está no seu KV)
+    // Pegando 'plan' do localStorage (vê se o nome da chave está batendo com o login!)
     const plano = (localStorage.getItem('meupix_user_plan') || "free").toLowerCase();
     
     const saudacaoElem = document.querySelector('#view-home h1');
@@ -222,21 +222,40 @@ function carregarBoasVindas() {
     
     if (badgePlano) {
         badgePlano.innerText = `Plano ${plano.toUpperCase()}`;
-        // Se for diamante ou admin, brilha o verde!
         badgePlano.style.color = (plano === 'free') ? '#888' : 'var(--primary)';
     }
 
-    // --- LIBERAR ANALYTICS SE FOR PLANO ALTO ---
-    const planosPro = ['ouro', 'diamante', 'admin'];
-    if (planosPro.includes(plano)) {
-        // Remove os borrões e os cadeados
+    // LISTA DE PRIVILEGIADOS
+    const ePro = ['bronze', 'prata', 'ouro', 'diamante', 'admin'].includes(plano);
+
+    if (ePro) {
+        // 1. Libera os mini-cards da Home
+        document.querySelectorAll('.lock-overlay').forEach(el => el.remove());
         document.querySelectorAll('.locked').forEach(el => el.classList.remove('locked'));
-        document.querySelectorAll('.lock-overlay').forEach(el => el.style.display = 'none');
-        
-        // Se estiver na aba analytics, podemos até injetar um aviso de "Modo PRO Ativo"
-        const areaAnalytics = document.querySelector('#view-analytics .stat-card');
-        if (areaAnalytics && areaAnalytics.innerHTML.includes('🔒')) {
-            areaAnalytics.innerHTML = `<h3>📊 Gráficos de Performance</h3><p>Seus dados estão sendo processados em tempo real.</p>`;
+
+        // 2. Libera a aba Analytics de verdade
+        const placeholder = document.getElementById('analytics-placeholder');
+        if (placeholder) {
+            placeholder.innerHTML = `
+                <div style="padding: 20px;">
+                    <h3 style="color:var(--primary)">📈 Tráfego nos últimos 7 dias</h3>
+                    <div style="display:flex; align-items:flex-end; gap:15px; height:150px; justify-content:center; margin-top:30px;">
+                        <div style="width:30px; background:var(--primary); height:40%; border-radius:5px 5px 0 0;" title="Segunda"></div>
+                        <div style="width:30px; background:var(--primary); height:65%; border-radius:5px 5px 0 0;" title="Terça"></div>
+                        <div style="width:30px; background:var(--primary); height:50%; border-radius:5px 5px 0 0;" title="Quarta"></div>
+                        <div style="width:30px; background:var(--primary); height:85%; border-radius:5px 5px 0 0;" title="Quinta"></div>
+                        <div style="width:30px; background:var(--primary); height:100%; border-radius:5px 5px 0 0;" title="Sexta"></div>
+                        <div style="width:30px; background:var(--primary); height:30%; border-radius:5px 5px 0 0;" title="Sábado"></div>
+                        <div style="width:30px; background:var(--primary); height:20%; border-radius:5px 5px 0 0;" title="Domingo"></div>
+                    </div>
+                    <div style="display:flex; gap:15px; justify-content:center; margin-top:10px; color:#666; font-size:10px;">
+                        <span>SEG</span><span>TER</span><span>QUA</span><span>QUI</span><span>SEX</span><span>SAB</span><span>DOM</span>
+                    </div>
+                </div>
+            `;
+            // Atualiza valores fictícios
+            document.getElementById('uniqueViews').innerText = '1.248';
+            document.getElementById('convRate').innerText = '18.5%';
         }
     }
 }
