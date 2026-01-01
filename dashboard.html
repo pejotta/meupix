@@ -125,6 +125,7 @@
                 <a onclick="trocarAba('analytics')" class="nav-item" id="nav-analytics">📊 Analytics</a>
                 <a onclick="trocarAba('modelos')" class="nav-item" id="nav-modelos">🎨 Modelos</a>
                 <a onclick="trocarAba('planos')" class="nav-item" id="nav-planos">💎 Planos</a>
+                <a onclick="trocarAba('admin')" class="nav-item" id="nav-admin" style="display:none; color: #ff00ff;">⚙️ Master Admin</a>
             </nav>
             <div class="sidebar-footer">
                 <button onclick="logout()" class="btn-logout">Sair</button>
@@ -303,6 +304,34 @@
                     </div>
                 </div>
             </div>
+            
+            <div id="view-admin" class="aba-conteudo" style="display:none">
+    <header class="dash-header">
+        <div>
+            <h1 style="margin:0; color: #ff00ff;">Painel de Controle Master</h1>
+            <p style="color:#888">Gerencie usuários e aplique upgrades manuais.</p>
+        </div>
+    </header>
+
+    <div class="links-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Usuários no Banco de Dados</h2>
+            <button onclick="carregarUsuariosAdmin()" style="background:#222; color:#fff; border:1px solid #444; padding:8px 15px; border-radius:8px; cursor:pointer;">🔄 Atualizar Lista</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome / E-mail</th>
+                    <th>Plano Atual</th>
+                    <th>Ações de Upgrade</th>
+                    <th>Gestão</th>
+                </tr>
+            </thead>
+            <tbody id="adminUsersBody">
+                </tbody>
+        </table>
+    </div>
+</div>
         </main>
     </div>
 
