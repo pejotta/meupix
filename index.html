@@ -6,37 +6,6 @@
     <title>PIX Plus — Encurtador de Chaves PIX Inteligente</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* Ajuste específico para o menu da Index não quebrar o layout */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none; /* Esconde o menu padrão */
-                flex-direction: column;
-                position: absolute;
-                top: 70px;
-                left: 0;
-                width: 100%;
-                background: #111;
-                padding: 20px 0;
-                border-bottom: 1px solid #222;
-                text-align: center;
-                gap: 20px;
-                z-index: 1000;
-            }
-
-            /* Quando o menu estiver ativo na Index */
-            .nav-links.active {
-                display: flex;
-            }
-
-            .nav-links li { margin: 0; }
-            
-            .nav-container { justify-content: space-between; padding: 0 20px; }
-            
-            /* Ajuste do botão de login no mobile */
-            .btn-login { display: inline-block;}
-        }
-    </style>
 </head>
 <body>
 
