@@ -1,6 +1,38 @@
 // PixPlus.pro - Script Principal (Versão Full Gold 🚀)
 const API_URL = "https://meupix-api.moneynanet-yt.workers.dev";
 
+// --- ADMIN E LOGIN (SEM ALTERAÇÕES DE LÓGICA, APENAS FIX DE TOKEN) ---
+
+async function logar() {
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('password').value;
+    try {
+        const res = await fetch(`${API_URL}/api/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, senha })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            localStorage.setItem('meupix_token', data.token);
+            localStorage.setItem('meupix_user_name', data.nome);
+            localStorage.setItem('meupix_user_email', email);
+            localStorage.setItem('meupix_user_plan', data.plan.toLowerCase()); 
+            window.location.href = '/dashboard.html';
+        } else { alert(data.error || "Erro no login."); }
+    } catch (err) { alert("Erro de conexão."); }
+}
+
+// Inicializador
+window.addEventListener('DOMContentLoaded', () => {
+    injetarFavicon();
+    if (window.location.pathname.includes('dashboard')) {
+        carregarMeusLinks(); // Esta função agora chama o Analytics junto
+        carregarBoasVindas();
+        checarPrivilegiosAdmin();
+    }
+});
+
 // --- 1. ESTADO GLOBAL ---
 let linksGlobais = [];
 let paginaAtual = 1;
