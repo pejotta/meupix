@@ -123,8 +123,8 @@ header {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 25px;
-    max-width: 1200px;
-    margin: 50px auto 0;
+    max-width: 1500px;
+    margin: 30px auto;
 }
 
 .price-card {
