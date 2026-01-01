@@ -1,4 +1,4 @@
-// PixPlus.pro - Script Principal (Versão Gold 🚀) - REVISADO
+// PixPlus.pro - Script Principal (Versão Full Gold 🚀)
 const API_URL = "https://meupix-api.moneynanet-yt.workers.dev";
 
 // --- 1. ESTADO GLOBAL ---
@@ -31,7 +31,22 @@ function logout() {
     window.location.href = '/login.html';
 }
 
-// --- 3. GESTÃO DE LINKS E ANALYTICS ---
+function trocarAba(aba) {
+    document.querySelectorAll('.aba-conteudo').forEach(div => div.style.display = 'none');
+    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+    
+    const view = document.getElementById(`view-${aba}`);
+    const nav = document.getElementById(`nav-${aba}`);
+    
+    if (view) view.style.display = 'block';
+    if (nav) nav.classList.add('active');
+
+    if (aba === 'planos') gerenciarBotoesPlanos();
+    if (aba === 'admin') carregarUsuariosAdmin();
+    if (aba === 'analytics') renderizarAnalyticsDetalhado();
+}
+
+// --- 3. GESTÃO DE LINKS ---
 
 async function carregarMeusLinks() {
     const token = verificarSessao();
@@ -44,9 +59,9 @@ async function carregarMeusLinks() {
         if (res.status === 401) return logout();
         
         linksGlobais = await res.json();
-        
-        // Renderiza a tabela principal e a aba de Analytics
         renderizarTabela();
+        
+        // Se estiver na aba analytics, atualiza ela também
         if (document.getElementById('analyticsBody')) {
             renderizarAnalyticsDetalhado();
         }
@@ -95,24 +110,65 @@ function renderizarTabela() {
     renderizarPaginacao();
 }
 
-// --- NOVO: ANALYTICS TUNADO (CAIXAS E DISPOSITIVOS) ---
+async function confirmarExclusao(slug) {
+    if (!confirm(`Pejotta, deletar o link /${slug}?`)) return;
+    try {
+        const res = await fetch(`${API_URL}/api/links/${slug}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': localStorage.getItem('meupix_token') }
+        });
+        if (res.ok) carregarMeusLinks();
+    } catch (e) { alert("Erro ao excluir."); }
+}
+
+// --- 4. MODAL E EDIÇÃO ---
+
+function abrirModalEdicao(slugAtual) {
+    document.getElementById('editOldSlug').value = slugAtual;
+    document.getElementById('editNewSlug').value = slugAtual;
+    document.getElementById('modalEdicao').style.display = 'flex';
+}
+
+function fecharModalEdicao() {
+    document.getElementById('modalEdicao').style.display = 'none';
+}
+
+async function salvarNovaSlug() {
+    const oldSlug = document.getElementById('editOldSlug').value;
+    const newSlug = document.getElementById('editNewSlug').value.trim().toLowerCase();
+    if (!newSlug || newSlug === oldSlug) return fecharModalEdicao();
+
+    try {
+        const response = await fetch(`${API_URL}/api/links/edit`, {
+            method: 'POST',
+            body: JSON.stringify({ oldSlug, newSlug }),
+            headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('meupix_token') }
+        });
+        if (response.ok) {
+            fecharModalEdicao();
+            carregarMeusLinks();
+        } else {
+            const r = await response.json();
+            alert(r.error);
+        }
+    } catch (e) { alert("Erro ao salvar."); }
+}
+
+// --- 5. ANALYTICS ---
+
 function renderizarAnalyticsDetalhado() {
     let totalClicks = 0, totalCopies = 0, totalReveals = 0;
     const tabelaBody = document.getElementById('analyticsBody');
-    tabelaBody.innerHTML = '';
+    if (!tabelaBody) return;
 
-    linksGlobais.forEach(link => {
+    tabelaBody.innerHTML = linksGlobais.map(link => {
         const copies = parseInt(link.stats?.copies || 0);
         const reveals = parseInt(link.stats?.reveals || 0);
         const clicks = parseInt(link.clicks || 0);
+        totalClicks += clicks; totalCopies += copies; totalReveals += reveals;
+        const conv = clicks > 0 ? Math.round(((copies + reveals) / clicks) * 100) : 0;
 
-        totalClicks += clicks;
-        totalCopies += copies;
-        totalReveals += reveals;
-
-        const conversion = clicks > 0 ? Math.round(((copies + reveals) / clicks) * 100) : 0;
-
-        tabelaBody.innerHTML += `
+        return `
             <tr>
                 <td><strong>/${link.slug}</strong></td>
                 <td>${clicks}</td>
@@ -120,45 +176,84 @@ function renderizarAnalyticsDetalhado() {
                 <td>${copies}</td>
                 <td>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="engagement-bar"><div class="engagement-fill" style="width: ${conversion}%"></div></div>
-                        <span>${conversion}%</span>
+                        <div class="engagement-bar"><div class="engagement-fill" style="width: ${conv}%"></div></div>
+                        <span>${conv}%</span>
                     </div>
                 </td>
             </tr>`;
-    });
+    }).join('');
 
-    // Atualiza os Cards Principais
     document.getElementById('totalAcessos').innerText = totalClicks;
     document.getElementById('totalRevelacoes').innerText = totalReveals;
     document.getElementById('totalCopias').innerText = totalCopies;
-
-    // Simulação de Dados Geográficos e Dispositivos (Enquanto o Worker coleta)
+    
+    // Rankings fictícios (podemos automatizar depois)
     renderizarRankings();
 }
 
 function renderizarRankings() {
     const deviceList = document.getElementById('deviceList');
     const geoList = document.getElementById('geoList');
+    if(deviceList) deviceList.innerHTML = `<div class="rank-item main"><span>Mobile</span><span>78%</span></div><div class="rank-item secondary"><span>Desktop</span><span>22%</span></div>`;
+    if(geoList) geoList.innerHTML = `<div class="rank-item main"><span>Brasil 🇧🇷</span><span>95%</span></div><div class="rank-item secondary"><span>Outros</span><span>5%</span></div>`;
+}
 
-    if(deviceList) {
-        deviceList.innerHTML = `
-            <div class="rank-item main"><span class="name">Mobile</span><span class="value">78%</span></div>
-            <div class="rank-item secondary"><span>Desktop</span><span>20%</span></div>
-            <div class="rank-item secondary"><span>Tablet</span><span>2%</span></div>`;
-    }
-    if(geoList) {
-        geoList.innerHTML = `
-            <div class="rank-item main"><span class="name">Brasil 🇧🇷</span><span class="value">95%</span></div>
-            <div class="rank-item secondary"><span>Portugal 🇵🇹</span><span>3%</span></div>
-            <div class="rank-item secondary"><span>Outros</span><span>2%</span></div>`;
+// --- 6. ADMIN E INTERFACE ---
+
+function carregarBoasVindas() {
+    const nome = localStorage.getItem('meupix_user_name') || "Usuário";
+    const plano = (localStorage.getItem('meupix_user_plan') || "free").toLowerCase();
+    const saudacaoElem = document.querySelector('#view-home h1');
+    const badgePlano = document.querySelector('.badge-plan'); 
+    
+    if (saudacaoElem) saudacaoElem.innerText = `Bem-vindo, ${nome.split(' ')[0]}!`;
+    if (badgePlano) {
+        badgePlano.innerText = `Plano ${plano.toUpperCase()}`;
+        badgePlano.style.color = (plano === 'free') ? '#888' : 'var(--primary)';
     }
 }
 
-// --- CONTINUAÇÃO DAS SUAS FUNÇÕES ORIGINAIS ---
+async function carregarUsuariosAdmin() {
+    const lista = document.getElementById('adminUsersBody');
+    if(!lista) return;
+    try {
+        const response = await fetch(`${API_URL}/api/admin/list-users`, {
+            headers: { 'Authorization': localStorage.getItem('meupix_token') }
+        });
+        const usuarios = await response.json();
+        lista.innerHTML = usuarios.map(u => `
+            <tr>
+                <td><b>${u.nome}</b><br><small>${u.email}</small></td>
+                <td><span class="badge-plan">${(u.plan || 'free').toUpperCase()}</span></td>
+                <td>
+                    <select onchange="aplicarUpgrade('${u.email}', this.value)" style="background:#111; color:#00c896; border:1px solid #333; padding:5px; border-radius:5px;">
+                        <option value="">Upgrade...</option>
+                        <option value="free">Free</option><option value="ouro">Ouro</option><option value="diamante">Diamante</option><option value="admin">Admin</option>
+                    </select>
+                </td>
+                <td><button onclick="deletarUsuario('${u.email}')" style="color:#ff4d4d; background:none; border:none; cursor:pointer;">Deletar</button></td>
+            </tr>`).join('');
+    } catch (e) { console.error(e); }
+}
+
+async function aplicarUpgrade(emailAlvo, novoPlano) {
+    if (!novoPlano || !confirm(`Mudar ${emailAlvo} para ${novoPlano.toUpperCase()}?`)) return;
+    try {
+        const response = await fetch(`${API_URL}/api/admin/update-plan`, {
+            method: 'POST',
+            body: JSON.stringify({ email: emailAlvo, plan: novoPlano }),
+            headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('meupix_token') }
+        });
+        if (response.ok) {
+            alert('Sucesso! 🚀');
+            carregarUsuariosAdmin();
+        }
+    } catch (e) { alert('Erro.'); }
+}
 
 function copiarLink(slug) {
     const url = `pixplus.pro/${slug}`;
-    navigator.clipboard.writeText(url).then(() => { alert("Link copiado: " + url); });
+    navigator.clipboard.writeText(url).then(() => alert("Link copiado!"));
 }
 
 function renderizarPaginacao() {
@@ -175,36 +270,20 @@ function renderizarPaginacao() {
 
 function mudarPagina(num) { paginaAtual = num; renderizarTabela(); }
 
-// --- ADMIN E LOGIN (SEM ALTERAÇÕES DE LÓGICA, APENAS FIX DE TOKEN) ---
-
-async function logar() {
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('password').value;
-    try {
-        const res = await fetch(`${API_URL}/api/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, senha })
-        });
-        const data = await res.json();
-        if (res.ok) {
-            localStorage.setItem('meupix_token', data.token);
-            localStorage.setItem('meupix_user_name', data.nome);
-            localStorage.setItem('meupix_user_email', email);
-            localStorage.setItem('meupix_user_plan', data.plan.toLowerCase()); 
-            window.location.href = '/dashboard.html';
-        } else { alert(data.error || "Erro no login."); }
-    } catch (err) { alert("Erro de conexão."); }
+function checarPrivilegiosAdmin() {
+    const plano = (localStorage.getItem('meupix_user_plan') || "").toLowerCase();
+    if (plano === 'admin') {
+        const btnAdmin = document.getElementById('nav-admin');
+        if (btnAdmin) btnAdmin.style.display = 'flex';
+    }
 }
 
-// Inicializador
+// --- INICIALIZAÇÃO ---
 window.addEventListener('DOMContentLoaded', () => {
     injetarFavicon();
     if (window.location.pathname.includes('dashboard')) {
-        carregarMeusLinks(); // Esta função agora chama o Analytics junto
+        carregarMeusLinks();
         carregarBoasVindas();
         checarPrivilegiosAdmin();
     }
 });
-
-// [Mantenha suas funções de fecharModal, salvarNovaSlug e aplicarUpgrade conforme o original]
