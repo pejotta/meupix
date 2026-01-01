@@ -252,3 +252,47 @@ async function salvarNovaSlug() {
 // Funções de apoio (Paginacao e Exclusão omitidas aqui para brevidade, mas devem ser mantidas)
 function mudarPagina(num) { paginaAtual = num; renderizarTabela(); }
 function renderizarPaginacao() { /* ... sua lógica de paginação ... */ }
+
+// 1. FILTRO DE BUSCA PARA O ADMIN
+function filtrarUsuariosAdmin() {
+    const termo = document.getElementById('buscaUsuario').value.toLowerCase();
+    const linhas = document.querySelectorAll('#adminUsersBody tr');
+
+    linhas.forEach(linha => {
+        const textoLinha = linha.innerText.toLowerCase();
+        linha.style.display = textoLinha.includes(termo) ? '' : 'none';
+    });
+}
+
+// 2. CORREÇÃO DO BOTÃO "PLANO ATIVO"
+function gerenciarBotoesPlanos() {
+    const planoUsuario = (localStorage.getItem('meupix_user_plan') || 'free').toLowerCase();
+    const cards = document.querySelectorAll('.plano-card');
+
+    cards.forEach(card => {
+        const h3 = card.querySelector('h3');
+        if (!h3) return;
+        
+        // Remove emojis e espaços para comparar apenas o texto limpo
+        const nomePlanoCard = h3.innerText.toLowerCase().replace(/[^\w]/g, '').trim();
+        const btn = card.querySelector('.btn-upgrade, button');
+
+        // Reset padrão
+        if (btn) {
+            btn.innerText = "Fazer Upgrade";
+            btn.style.cssText = ""; 
+            btn.removeAttribute('disabled');
+        }
+
+        // Se for o plano que o usuário tem no Banco de Dados
+        if (nomePlanoCard === planoUsuario || (planoUsuario === 'free' && nomePlanoCard === 'gratis')) {
+            if (btn) {
+                btn.innerText = "Plano Ativo";
+                btn.style.cssText = "background:#333 !important; color:#888 !important; pointer-events:none; cursor:default; border:none;";
+                btn.setAttribute('disabled', 'true');
+                card.style.borderColor = "var(--primary)";
+                card.style.boxShadow = "0 0 20px rgba(0, 200, 150, 0.2)";
+            }
+        }
+    });
+}
