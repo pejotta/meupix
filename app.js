@@ -89,6 +89,28 @@ function renderizarTabela() {
     renderizarPaginacao();
 }
 
+function copiarLink(slug) {
+    const url = `pixplus.pro/${slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+        alert("Link copiado: " + url);
+    });
+}
+
+function renderizarPaginacao() {
+    let pagContainer = document.getElementById('paginacao');
+    if (!pagContainer) return;
+    
+    const totalPaginas = Math.ceil(linksGlobais.length / linksPorPagina);
+    let html = '';
+    for (let i = 1; i <= totalPaginas; i++) {
+        const ativo = i === paginaAtual ? "background:#00c896; color:#000;" : "background:#222; color:#fff;";
+        html += `<button onclick="mudarPagina(${i})" style="${ativo} border:none; padding:5px 12px; border-radius:5px; cursor:pointer; font-weight:bold; margin:0 2px;">${i}</button>`;
+    }
+    pagContainer.innerHTML = html;
+}
+
+function mudarPagina(num) { paginaAtual = num; renderizarTabela(); }
+
 // --- 4. ADMINISTRAÇÃO ---
 
 function checarPrivilegiosAdmin() {
@@ -115,7 +137,7 @@ async function carregarUsuariosAdmin() {
         lista.innerHTML = usuarios.map(u => `
             <tr>
                 <td><b>${u.nome}</b><br><small>${u.email}</small></td>
-                <td><span class="badge-plan">${u.plan || 'free'}</span></td>
+                <td><span class="badge-plan">${(u.plan || 'free').toUpperCase()}</span></td>
                 <td>
                     <select onchange="aplicarUpgrade('${u.email}', this.value)" style="background:#111; color:#00c896; border:1px solid #333; padding:5px; border-radius:5px;">
                         <option value="">Upgrade...</option>
@@ -136,20 +158,40 @@ async function carregarUsuariosAdmin() {
 
 async function aplicarUpgrade(emailAlvo, novoPlano) {
     if (!novoPlano || !confirm(`Mudar ${emailAlvo} para ${novoPlano.toUpperCase()}?`)) return;
+    
     try {
         const response = await fetch(`${API_URL}/api/admin/update-plan`, {
             method: 'POST',
             body: JSON.stringify({ email: emailAlvo, plan: novoPlano }),
-            headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('meupix_token') }
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization': localStorage.getItem('meupix_token') 
+            }
         });
+
         if (response.ok) {
-            alert('Plano atualizado!');
-            carregarUsuariosAdmin();
+            alert('Plano atualizado com sucesso! 🚀');
+            
+            // AUTO-UPDATE PARA O ADMIN:
+            const meuEmail = localStorage.getItem('meupix_user_email');
+            if (emailAlvo === meuEmail) {
+                localStorage.setItem('meupix_user_plan', novoPlano.toLowerCase());
+                carregarBoasVindas(); 
+            }
+            carregarUsuariosAdmin(); 
         }
-    } catch (e) { alert('Erro no upgrade.'); }
+    } catch (e) { alert('Erro na conexão.'); }
 }
 
-// --- 5. LOGIN E CADASTRO ---
+function filtrarUsuariosAdmin() {
+    const termo = document.getElementById('buscaUsuario').value.toLowerCase();
+    const linhas = document.querySelectorAll('#adminUsersBody tr');
+    linhas.forEach(linha => {
+        linha.style.display = linha.innerText.toLowerCase().includes(termo) ? '' : 'none';
+    });
+}
+
+// --- 5. LOGIN ---
 
 async function logar() {
     const email = document.getElementById('email').value;
@@ -166,7 +208,7 @@ async function logar() {
         if (res.ok) {
             localStorage.setItem('meupix_token', data.token);
             localStorage.setItem('meupix_user_name', data.nome);
-            localStorage.setItem('meupix_user_email', email); // Importante para o checarPrivilegiosAdmin
+            localStorage.setItem('meupix_user_email', email);
             localStorage.setItem('meupix_user_plan', data.plan.toLowerCase()); 
             window.location.href = '/dashboard.html';
         } else {
@@ -207,13 +249,41 @@ function carregarBoasVindas() {
     }
 }
 
+function gerenciarBotoesPlanos() {
+    const planoUsuario = (localStorage.getItem('meupix_user_plan') || 'free').toLowerCase();
+    const cards = document.querySelectorAll('.plano-card');
+
+    cards.forEach(card => {
+        const h3 = card.querySelector('h3');
+        if (!h3) return;
+        
+        const nomePlanoCard = h3.innerText.toLowerCase().replace(/[^\w]/g, '').trim();
+        const btn = card.querySelector('.btn-upgrade, button');
+
+        if (btn) {
+            btn.innerText = "Fazer Upgrade";
+            btn.style.cssText = ""; 
+            btn.removeAttribute('disabled');
+        }
+
+        if (nomePlanoCard === planoUsuario || (planoUsuario === 'free' && nomePlanoCard === 'gratis')) {
+            if (btn) {
+                btn.innerText = "Plano Ativo";
+                btn.style.cssText = "background:#333 !important; color:#888 !important; pointer-events:none; cursor:default; border:none;";
+                btn.setAttribute('disabled', 'true');
+                card.style.borderColor = "var(--primary)";
+            }
+        }
+    });
+}
+
 // Inicializador
 window.addEventListener('DOMContentLoaded', () => {
     injetarFavicon();
     if (window.location.pathname.includes('dashboard')) {
         carregarMeusLinks();
         carregarBoasVindas();
-        checarPrivilegiosAdmin(); // ESSENCIAL PARA APARECER O MENU ADMIN
+        checarPrivilegiosAdmin();
     }
 });
 
@@ -241,58 +311,10 @@ async function salvarNovaSlug() {
         });
         if (response.ok) {
             fecharModalEdicao();
-            carregarMeusLinks(); // Nome correto da função
+            carregarMeusLinks();
         } else {
             const r = await response.json();
             alert(r.error);
         }
     } catch (e) { alert("Erro ao salvar."); }
-}
-
-// Funções de apoio (Paginacao e Exclusão omitidas aqui para brevidade, mas devem ser mantidas)
-function mudarPagina(num) { paginaAtual = num; renderizarTabela(); }
-function renderizarPaginacao() { /* ... sua lógica de paginação ... */ }
-
-// 1. FILTRO DE BUSCA PARA O ADMIN
-function filtrarUsuariosAdmin() {
-    const termo = document.getElementById('buscaUsuario').value.toLowerCase();
-    const linhas = document.querySelectorAll('#adminUsersBody tr');
-
-    linhas.forEach(linha => {
-        const textoLinha = linha.innerText.toLowerCase();
-        linha.style.display = textoLinha.includes(termo) ? '' : 'none';
-    });
-}
-
-// 2. CORREÇÃO DO BOTÃO "PLANO ATIVO"
-function gerenciarBotoesPlanos() {
-    const planoUsuario = (localStorage.getItem('meupix_user_plan') || 'free').toLowerCase();
-    const cards = document.querySelectorAll('.plano-card');
-
-    cards.forEach(card => {
-        const h3 = card.querySelector('h3');
-        if (!h3) return;
-        
-        // Remove emojis e espaços para comparar apenas o texto limpo
-        const nomePlanoCard = h3.innerText.toLowerCase().replace(/[^\w]/g, '').trim();
-        const btn = card.querySelector('.btn-upgrade, button');
-
-        // Reset padrão
-        if (btn) {
-            btn.innerText = "Fazer Upgrade";
-            btn.style.cssText = ""; 
-            btn.removeAttribute('disabled');
-        }
-
-        // Se for o plano que o usuário tem no Banco de Dados
-        if (nomePlanoCard === planoUsuario || (planoUsuario === 'free' && nomePlanoCard === 'gratis')) {
-            if (btn) {
-                btn.innerText = "Plano Ativo";
-                btn.style.cssText = "background:#333 !important; color:#888 !important; pointer-events:none; cursor:default; border:none;";
-                btn.setAttribute('disabled', 'true');
-                card.style.borderColor = "var(--primary)";
-                card.style.boxShadow = "0 0 20px rgba(0, 200, 150, 0.2)";
-            }
-        }
-    });
 }
