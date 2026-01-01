@@ -393,3 +393,56 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// --- FUNÇÕES DE EDIÇÃO DE SLUG (OURO/DIAMANTE) ---
+
+function abrirModalEdicao(slugAtual) {
+    document.getElementById('editOldSlug').value = slugAtual;
+    document.getElementById('editNewSlug').value = slugAtual;
+    document.getElementById('modalEdicao').style.display = 'flex';
+}
+
+function fecharModalEdicao() {
+    document.getElementById('modalEdicao').style.display = 'none';
+}
+
+async function salvarNovaSlug() {
+    const oldSlug = document.getElementById('editOldSlug').value;
+    const newSlug = document.getElementById('editNewSlug').value.trim().toLowerCase();
+    
+    // Validação básica
+    if (!newSlug || newSlug === oldSlug) {
+        fecharModalEdicao();
+        return;
+    }
+
+    // Regex para evitar caracteres estranhos no link
+    const regex = /^[a-z0-9-_]+$/;
+    if (!regex.test(newSlug)) {
+        alert("O link deve conter apenas letras, números, traços ou underlines.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/links/edit`, {
+            method: 'POST',
+            body: JSON.stringify({ oldSlug, newSlug }),
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('meupix_token')
+            }
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("Link atualizado com sucesso! 🚀");
+            fecharModalEdicao();
+            // Recarrega a lista para mostrar o novo slug
+            if (typeof carregarLinks === "function") carregarLinks();
+        } else {
+            alert(result.error || "Erro ao atualizar link.");
+        }
+    } catch (e) {
+        alert("Erro na conexão com o Banco de Dados.");
+    }
+}
