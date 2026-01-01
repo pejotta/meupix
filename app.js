@@ -145,6 +145,76 @@ function renderizarPaginacao() {
 
 function mudarPagina(num) { paginaAtual = num; renderizarTabela(); }
 
+// Adicione isso dentro da sua função de inicialização ou no final do arquivo
+function checarPrivilegiosAdmin() {
+    const email = localStorage.getItem('meupix_user_email');
+    const plano = localStorage.getItem('meupix_user_plan');
+
+    // Se for o seu e-mail ou o plano for admin, mostra o menu secreto
+    if (email === 'admin@meupix.com' || plano === 'admin') {
+        const btnAdmin = document.getElementById('nav-admin');
+        if (btnAdmin) btnAdmin.style.display = 'flex';
+    }
+}
+
+// Função para buscar todos os usuários (Exige que seu Worker tenha essa rota!)
+async function carregarUsuariosAdmin() {
+    const lista = document.getElementById('adminUsersBody');
+    lista.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px;">Carregando usuários...</td></tr>`;
+
+    try {
+        // Aqui chamamos a rota do Worker que lista tudo
+        const response = await fetch(`${API_URL}/admin/list-users`, {
+            headers: { 'Authorization': localStorage.getItem('meupix_token') }
+        });
+        const usuarios = await response.json();
+
+        lista.innerHTML = usuarios.map(u => `
+            <tr>
+                <td>
+                    <div style="font-weight:bold;">${u.nome}</div>
+                    <div style="font-size:12px; color:#666;">${u.email}</div>
+                </td>
+                <td><span class="badge-plan">${u.plan || 'free'}</span></td>
+                <td>
+                    <select onchange="aplicarUpgrade('${u.email}', this.value)" style="background:#111; color:var(--primary); border:1px solid #333; padding:5px; border-radius:5px;">
+                        <option value="">Mudar Plano...</option>
+                        <option value="free">Free</option>
+                        <option value="bronze">Bronze</option>
+                        <option value="prata">Prata</option>
+                        <option value="ouro">Ouro</option>
+                        <option value="diamante">Diamante</option>
+                    </select>
+                </td>
+                <td>
+                    <button onclick="deletarUsuario('${u.email}')" style="background:none; border:none; color:#ff4d4d; cursor:pointer;">Deletar</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        lista.innerHTML = `<tr><td colspan="4" style="color:red; text-align:center;">Erro ao carregar. Verifique o Worker.</td></tr>`;
+    }
+}
+
+async function aplicarUpgrade(emailAlvo, novoPlano) {
+    if (!novoPlano) return;
+    if (!confirm(`Confirmar upgrade de ${emailAlvo} para ${novoPlano.toUpperCase()}?`)) return;
+
+    try {
+        const response = await fetch(`${API_URL}/admin/update-plan`, {
+            method: 'POST',
+            body: JSON.stringify({ email: emailAlvo, plan: novoPlano }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (response.ok) {
+            alert('Upgrade aplicado com sucesso!');
+            carregarUsuariosAdmin(); // Recarrega a lista
+        }
+    } catch (e) {
+        alert('Erro ao aplicar upgrade.');
+    }
+}
 // --- 4. ALERTA DE UPGRADE (TOAST) ---
 
 function mostrarAlertaUpgrade(plano) {
@@ -322,3 +392,4 @@ window.addEventListener('DOMContentLoaded', () => {
         carregarBoasVindas();
     }
 });
+
