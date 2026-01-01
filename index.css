@@ -1,0 +1,573 @@
+:root {
+
+    --primary: #00c896;
+
+    --primary-dark: #00a77a;
+
+    --bg-dark: #0b0b0b;
+
+    --card-bg: #121212;
+
+    --text-main: #eaeaea;
+
+    --text-dim: #999;
+
+}
+
+
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+
+body {
+
+    background-color: var(--bg-dark);
+
+    color: var(--text-main);
+
+    font-family: 'Inter', sans-serif;
+
+    line-height: 1.6;
+
+    scroll-behavior: smooth;
+
+}
+
+
+
+/* Header */
+
+header {
+
+    padding: 20px 5%;
+
+    background: rgba(11, 11, 11, 0.8);
+
+    backdrop-filter: blur(10px);
+
+    position: fixed;
+
+    width: 100%;
+
+    z-index: 1000;
+
+}
+
+
+
+.nav-container {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+}
+
+
+
+.logo { font-size: 1.5rem; font-weight: 800; max-width:200px; height:auto; }
+
+.logo img { font-size: 1.5rem; font-weight: 800; max-width:200px; height:auto;}
+
+.logo span { color: var(--primary); }
+
+
+
+.nav-links { list-style: none; display: flex; align-items: center; gap: 30px; }
+
+.nav-links a { text-decoration: none; color: var(--text-main); font-weight: 500; transition: 0.3s; }
+
+.nav-links a:hover { color: var(--primary); }
+
+
+
+.btn-login {
+
+    background: var(--primary);
+
+    color: #000 !important;
+
+    padding: 8px 20px;
+
+    border-radius: 6px;
+
+}
+
+
+
+/* Hero */
+
+.hero {
+
+    padding: 150px 5% 100px;
+
+    text-align: center;
+
+    background: radial-gradient(circle at top, #1b1b1b, #0b0b0b);
+
+}
+
+
+
+.hero h1 { font-size: 3rem; margin-bottom: 20px; }
+
+.hero p { color: var(--text-dim); font-size: 1.2rem; margin-bottom: 40px;}
+
+
+
+.auth-container button {
+
+    background: var(--primary); color: #000 !important; padding: 8px 20px; border-radius: 6px;  font-size:1.1em; cursor: pointer;
+
+}
+
+
+
+.generator-box {
+
+    max-width: 600px;
+
+    margin: 0 auto 20px;
+
+    background: var(--card-bg);
+
+    padding: 10px;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    gap: 10px;
+
+    border: 1px solid #333;
+
+}
+
+
+
+.generator-box input {
+
+    flex: 1;
+
+    background: transparent;
+
+    border: none;
+
+    color: #fff;
+
+    padding: 15px;
+
+    outline: none;
+
+    font-size: 1rem;
+
+}
+
+
+
+.generator-box button {
+
+    background: var(--primary);
+
+    border: none;
+
+    padding: 0 25px;
+
+    border-radius: 8px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+}
+
+
+
+/* Feature Cards */
+
+.features { padding: 100px 5%; max-width: 1200px; margin: 0 auto; }
+
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+
+.feature-card {
+
+    background: var(--card-bg);
+
+    padding: 40px;
+
+    border-radius: 15px;
+
+    text-align: center;
+
+    border: 1px solid #222;
+
+}
+
+.feature-card i { font-size: 2.5rem; color: var(--primary); margin-bottom: 20px; }
+
+
+
+/* Pricing */
+
+.pricing { padding: 100px 5%; background: #0f0f0f; }
+
+.pricing-grid {
+
+        display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+
+    gap: 20px;
+
+    max-width: 1400px;
+
+    margin: 50px auto 0;
+
+}
+
+
+
+.price-card {
+
+    background: var(--card-bg);
+
+    padding: 25px;
+
+    border-radius: 20px;
+
+    border: 1px solid #222;
+
+    position: relative;
+
+    font-size: 0.9em;
+
+}
+
+
+
+.price-card.featured { border-color: var(--primary); transform: scale(1.05); }
+
+.badge {
+
+    position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+
+    background: var(--primary); color: #000; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 800;
+
+}
+
+
+
+.price {font-size: 2em;
+
+    font-weight: 800;
+
+    margin: 20px 0;}
+
+.price span { font-size: 1rem; color: var(--text-dim); }
+
+
+
+.price-card ul {    list-style: circle;
+
+    margin-bottom: 30px;
+
+    text-align: left;}
+
+.price-card li { margin-bottom: 12px; }
+
+.price-card li.disabled { color: #555; text-decoration: line-through; }
+
+.price-card li i { margin-right: 10px; color: var(--primary); }
+
+
+
+.btn-plan {
+
+    display: block; text-decoration: none; background: #222; color: #fff;
+
+    text-align: center; padding: 15px; border-radius: 10px; font-weight: 700; transition: 0.3s;
+
+}
+
+.featured .btn-plan { background: var(--primary); color: #000; }
+
+
+
+/* Footer */
+
+footer { padding: 50px 5%; border-top: 1px solid #222; text-align: center; }
+
+.footer-content { display: flex;
+
+    justify-content: space-between;
+
+    flex-wrap: nowrap;
+
+    align-items: center; }
+
+.footer-content p { color: var(--text-dim); margin: 20px 0;}
+
+
+
+.dash-wrapper { display: flex; min-height: 100vh; }
+
+
+
+.sidebar { 
+
+    width: 250px; background: #111; border-right: 1px solid #222; 
+
+    display: flex; flex-direction: column; padding: 20px; position: fixed; height: 100vh;
+
+}
+
+
+
+.main-content { margin-left: 250px; flex: 1; padding: 40px; }
+
+
+
+.sidebar-nav { flex: 1; margin-top: 40px; }
+
+
+
+.nav-item { 
+
+    display: block; padding: 12px 15px; color: #888; text-decoration: none; 
+
+    border-radius: 8px; margin-bottom: 5px; transition: 0.3s;
+
+}
+
+
+
+.nav-item.active, .nav-item:hover { background: #1a1a1a; color: #00c896; }
+
+
+
+.btn-logout { 
+
+    width: 100%; padding: 10px; background: #222; border: none; 
+
+    color: #ff4d4d; border-radius: 8px; cursor: pointer; 
+
+}
+
+/* --- SISTEMA UNIVERSAL DE MENU (PADRÃO PIX Plus) --- */
+
+
+
+/* 1. O Botão Hamburguer */
+
+.menu-toggle-btn {
+
+    display: none; /* Escondido no PC */
+
+    background: none;
+
+    border: none;
+
+    color: var(--primary);
+
+    font-size: 30px;
+
+    cursor: pointer;
+
+    z-index: 1100;
+
+    transition: 0.3s;
+
+}
+
+
+
+/* 2. A Cortina (Overlay) */
+
+.menu-overlay {
+
+    display: none;
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.8);
+
+    backdrop-filter: blur(4px);
+
+    z-index: 998;
+
+}
+
+
+
+.menu-overlay.active {
+
+    display: block;
+
+}
+
+
+
+/* 3. Ajustes para Mobile (Telas até 768px) */
+
+@media (max-width: 768px) {
+
+    .menu-toggle-btn {
+
+        display: block; /* Aparece no celular */
+
+    }
+
+
+
+    /* Força a sidebar a se comportar como menu mobile */
+
+    .sidebar {
+
+        position: fixed !important;
+
+        left: 0 !important;
+
+        top: 0 !important;
+
+        transform: translateX(-100%); /* Esconde na esquerda */
+
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        z-index: 1000 !important;
+
+    }
+
+
+
+    .sidebar.active {
+
+        transform: translateX(0); /* Desliza para dentro */
+
+        z-index: 99999 !important;
+
+    }
+
+
+
+    /* Ajuste para o conteúdo não ficar por baixo do topo fixo se houver */
+
+    .main-content {
+
+        margin-left: 0 !important;
+
+        padding-top: 70px !important;
+
+    }
+
+}
+
+/* --- TEMAS DE FUNDO (PÁGINA DE DESTINO) --- */
+
+
+
+/* Base da página de destino */
+
+.slug-page {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background-size: cover;
+
+    background-position: center;
+
+    background-attachment: fixed;
+
+}
+
+
+
+/* 1. Campos de Trigo (Vibe Clean/Paz) */
+
+.theme-wheat {
+
+    background-image: url('https://images.unsplash.com/photo-1444852538915-ac95232916dd?q=80&w=1920');
+
+}
+
+.theme-wheat .pix-card { background: rgba(255, 255, 255, 0.9); color: #333; backdrop-filter: blur(5px); }
+
+
+
+/* 2. Universo (Vibe Infinita) */
+
+.theme-universe {
+
+    background-image: url('https://images.unsplash.com/photo-1464802686167-b939a67e06a1?q=80&w=1920');
+
+}
+
+.theme-universe .pix-card { background: rgba(255, 255, 255, 0.85); color: #000; }
+
+
+
+/* 3. Céu (Vibe Leve) */
+
+.theme-sky {
+
+    background-image: url('https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?q=80&w=1920');
+
+}
+
+.theme-sky .pix-card { background: rgba(255, 255, 255, 0.9); border: 1px solid #ddd; }
+
+
+
+/* 4. Blockchain/Digital (Vibe Tech - Dark) */
+
+.theme-crypto {
+
+    background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=1920');
+
+}
+
+.theme-crypto .pix-card { background: rgba(20, 20, 20, 0.9); color: var(--primary); border: 1px solid var(--primary); }
+
+
+
+/* 5. Midnight City (Vibe Urbana/Noturna) */
+
+.theme-city {
+
+    background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1477346611705-65d1883cee1e?q=80&w=1920');
+
+}
+
+.theme-city .pix-card { background: rgba(15, 15, 15, 0.95); border-left: 5px solid var(--primary); }
+
+
+
+/* 6. Anime (Vibe Estética/Lofi) */
+
+.theme-anime {
+
+    background-image: url('https://images.unsplash.com/photo-1578632292335-df3abbb0d586?q=80&w=1920');
+
+}
+
+.theme-anime .pix-card { background: rgba(30, 0, 50, 0.8); color: #ff79c6; border: 2px dashed #ff79c6; }
