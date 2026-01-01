@@ -1,6 +1,11 @@
 // PixPlus.pro - Script Principal (Versão Full Gold 🚀)
 const API_URL = "https://meupix-api.moneynanet-yt.workers.dev";
 
+// --- 1. ESTADO GLOBAL ---
+let linksGlobais = [];
+let paginaAtual = 1;
+const linksPorPagina = 5;
+
 // --- ADMIN E LOGIN (SEM ALTERAÇÕES DE LÓGICA, APENAS FIX DE TOKEN) ---
 
 async function logar() {
@@ -32,11 +37,6 @@ window.addEventListener('DOMContentLoaded', () => {
         checarPrivilegiosAdmin();
     }
 });
-
-// --- 1. ESTADO GLOBAL ---
-let linksGlobais = [];
-let paginaAtual = 1;
-const linksPorPagina = 5;
 
 // --- 2. FUNÇÕES DE NAVEGAÇÃO E SESSÃO ---
 
