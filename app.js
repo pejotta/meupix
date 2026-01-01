@@ -318,3 +318,52 @@ async function salvarNovaSlug() {
         }
     } catch (e) { alert("Erro ao salvar."); }
 }
+async function carregarAnalytics() {
+    const response = await fetch('/api/links', {
+        headers: { 'Authorization': localStorage.getItem('token') }
+    });
+    const links = await response.json();
+
+    let totalClicks = 0;
+    let totalCopies = 0;
+    let totalReveals = 0;
+
+    const tabelaBody = document.getElementById('analyticsBody');
+    tabelaBody.innerHTML = '';
+
+    links.forEach(link => {
+        // Soma os totais para os Cards
+        const copies = parseInt(link.stats?.copies || 0);
+        const reveals = parseInt(link.stats?.reveals || 0);
+        const clicks = parseInt(link.clicks || 0);
+
+        totalClicks += clicks;
+        totalCopies += copies;
+        totalReveals += reveals;
+
+        // Calcula taxa de conversão (quem revelou ou copiou vs quem acessou)
+        const conversion = clicks > 0 ? Math.round(((copies + reveals) / clicks) * 100) : 0;
+
+        tabelaBody.innerHTML += `
+            <tr>
+                <td><strong>/${link.slug}</strong></td>
+                <td>${clicks}</td>
+                <td>${reveals}</td>
+                <td>${copies}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="engagement-bar">
+                            <div class="engagement-fill" style="width: ${conversion}%"></div>
+                        </div>
+                        <span>${conversion}%</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+
+    // Atualiza os Cards de Cima
+    document.getElementById('totalAcessos').innerText = totalClicks;
+    document.getElementById('totalRevelacoes').innerText = totalReveals;
+    document.getElementById('totalCopias').innerText = totalCopies;
+}
