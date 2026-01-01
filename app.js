@@ -28,16 +28,6 @@ async function logar() {
     } catch (err) { alert("Erro de conexão."); }
 }
 
-// Inicializador
-window.addEventListener('DOMContentLoaded', () => {
-    injetarFavicon();
-    if (window.location.pathname.includes('dashboard')) {
-        carregarMeusLinks(); // Esta função agora chama o Analytics junto
-        carregarBoasVindas();
-        checarPrivilegiosAdmin();
-    }
-});
-
 // --- 2. FUNÇÕES DE NAVEGAÇÃO E SESSÃO ---
 
 function injetarFavicon() {
